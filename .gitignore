@@ -1,6 +1,12 @@
 .vs
 **/.vs
 
-CzmTestPackage/CzmTestPackage.*
+Source/czmtestkit.egg*
 
-TestDirectory/abaqus*
+build
+
+Documentation/build
+Documentation/build/*
+
+TestDirectory/*/Job*
+TestDirectory/*/abaqus*

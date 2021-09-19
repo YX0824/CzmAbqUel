@@ -1,0 +1,12 @@
+name: docs
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - sphinx==3.4.3
+  - nbsphinx==0.8.1
+  - myst-parser==0.15.2
+  - pip
+  - pip:
+    - sphinx_rtd_theme==0.5.1
+    - groundwork-sphinx-theme

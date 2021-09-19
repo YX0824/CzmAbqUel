@@ -1,53 +1,35 @@
-# Cohesive Zone Model Implementation Using Abaqus User Elements
+# Project Description
 
-Description: This repository has python package developed for generating abaqus cae models required for testing abaqus user element subroutines for implementing cohesive zone models and post processing the results.
+This repository has python package ``czmtestkit`` developed for generating abaqus cae models required to test abaqus user subroutines for implementing cohesive zone models as well as post processing the results.
 
-### Software version: 0.0.0
+## Software v0.0.1
 
------
-
-Current Status: Empty Structure For Package. 
+**Current Status:**  
+* Funcitons to generate input files for single element and non standard tests with and without substrates.
+* Sample test cases for single element test.
+* Module functions for generating parts required for standardized tests are available.
+* History output can be extracted from abaqus output data base.
+* Magnitudes of load and displacement extracted from the history output can be plotted.  
  
-Expected developments :  
-Modules and test cases for the following models
-* Single element tests without substrates.
-* Single element tests with substrates.
-* Four element tests without substrates.
-* Four element tests with substrates.
-* Tension type standardized test under mode-1 and mixed mode loading.
-* 3 point bending type standardized test under mode-2 loading.
-* 3 point bending type standardized test under mixed mode loading. 
+**Future developments:**  
+*  Functions to generate assemblies and input files for mixed mode characterization using standardized tests (DCB, ADCB, ASLB, SLB, ENF)
+*  Example standarized test cases.
+*  Extend package to include fortran based user element subroutines for the cohesive zone. 
+*  Class to define part properties
 
-### Prerequisites
+## Documentation v0.0.1
 
-----
+**Current Status:**  
+* Module and function documentation.
+* Base theme and template.
+ 
+**Future developments:**  
+*  Pictorial representation of output bodies from part definitions and assembly definitions.
+*  Documentation and code citation information.
+*  Interactive options for authors.
 
-1. Abaqus CAE version 2018 or higher.
-2. Fortran compiler linked to abaqus.   
-	Checkout the following manual for instructions:   
-	[Abedin Nejad, Sobhan. (2019). Linking ABAQUS with FORTRAN user manual.](http://dx.doi.org/10.13140/RG.2.2.19391.87206)
-3. Miniconda version 4 or higher.
-
-### Installation
-
-----
-
-1. Create conda environment **CZ** using the environment.yml.  
-		`$ conda env create -f <local path to repository>/environment.yml`
-1. Verify the environment creation  
-		`$ conda env list`
-1. Activate environment  
-		`$ conda activate CZ`
-1. Verify the package installation  
-		`$ conda list -n CZ`  
-
-Look for package *czmtestpackage* in the list and ensure that the version printed matched the current version as mentioned in this file. If not, update the environment and verify the package installation again.  
-`$ conda activate CZ`   
-`$ conda env update -f <local path to repository>/environment.yml  --prune`  
-
-### Licensing and Copy Rights
-
-----
+## Licensing and Copy Rights
 
 [![License : GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  
-Author: Nanditha Mudunuru  
+
+Authors: Nanditha Mudunuru  |  Miguel Bessa  |  Albert Turon
