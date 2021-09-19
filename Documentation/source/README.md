@@ -1,4 +1,4 @@
-czmtestkit v0.0.1 Documentation
+czmtestkit v1.0.0-a.1.0.0 Documentation
 ================================
 
 Offical build is currently available on [Github](https://github.com/NMudunuru/czmtestkitDocs.git). 

@@ -23,7 +23,7 @@ copyright = '2021, Nanditha Mudunuru'
 author = 'Nanditha Mudunuru, Miguel Bessa, Albert Turon'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.0.1'
+release = 'v1.0.0-a'
 
 
 # -- General configuration ---------------------------------------------------

@@ -2,7 +2,7 @@
 
 This repository has python package ``czmtestkit`` developed for generating abaqus cae models required to test abaqus user subroutines for implementing cohesive zone models as well as post processing the results.
 
-## Software v0.0.1
+## Software v1.0.0-a.1.0.0
 
 **Current Status:**  
 * Funcitons to generate input files for single element and non standard tests with and without substrates.
@@ -17,7 +17,7 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
 *  Extend package to include fortran based user element subroutines for the cohesive zone. 
 *  Class to define part properties
 
-## Documentation v0.0.1
+## Documentation v1.0.0-a.1.0.0
 
 **Current Status:**  
 * Module and function documentation.
