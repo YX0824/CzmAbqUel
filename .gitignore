@@ -10,3 +10,7 @@ Documentation/build/*
 
 TestDirectory/*/Job*
 TestDirectory/*/abaqus*
+
+Source/czmtestkit/__pycache__
+Source/czmtestkit/preprocessors/__pycache__
+Source/czmtestkit/postprocessors/__pycache__

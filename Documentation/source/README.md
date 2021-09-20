@@ -1,4 +1,4 @@
-czmtestkit v1.0.0-a.1.0.0 Documentation
+czmtestkit v1.0.0-a.1.1.0 Documentation
 ================================
 
 Offical build is currently available on [Github](https://github.com/NMudunuru/czmtestkitDocs.git). 
@@ -23,6 +23,10 @@ Run the following commands to generate a html build for the documentation.
     $ make html
 
 To push changes to the build, setup ``https://github.com/NMudunuru/czmtestkitDocs.git`` as remote for the directory ``build\html``.
+
+Setting up github remote for deployment:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 From the directory ``build\html`` run the following lines when setting up for the first time
 
     $ git init

@@ -24,23 +24,34 @@ However, abaqus cannot access these package yet, so abqPython functions cannot b
 To import abaqus python environment based modules, we need to make abaqus search for modules in the path to the installed package as well. 
 The package will be located in the conda environment files with a path similar to the following::
 	
-	C:\Users\username\miniconda3\envs\CZ\Lib\site-packages\
+	C:\Users\username\miniconda3\envs\CZ\Lib\site-packages
 
 Initial path ``C:\Users\username\miniconda3`` might wary depending on your conda installation but the rest should be identical. 
-Find your local path and add it to abaqus cae system paths.
+Verify whether the package ``czmtestkit`` is in the ``site-packages`` directory.
+Add this path to abaqus cae system paths.
 To do this, look for abaqus .env files. 
-Find a version of the following path in your system::
+Find a version of the following file in your system::
 
 	C:\Program Files\Dassault Systemes\SimulationServices\V6R2018x\win_b64\SMA\site\custom_v6.env
 
-If custom environment file doesn't exist for some reason, you can use ``abaqus_v6.env`` instead.
+If ``custom_v6.env`` environment file doesn't exist for some reason, you can use ``abaqus_v6.env`` instead.
 In the environment file add the following lines::
 
 	# Adding system path for czmtestkit
 	import sys
-	sys.path.append('<PathToTheInstalledPackage>')
+	sys.path.append("<PathToTheInstalledPackage>")
 	
 Replace the text :code:`<PathToTheInstalledPackage>` with the path to your CZ environment site packages. 
+When using with windows, for sending the full path properly, edit the path as shown below.
+
+**Example path**::
+
+	C:\Users\username\miniconda3\envs\CZ\Lib\site-packages
+
+**Path string to be passed to abaqus**::
+
+	C:\\Users\\username\\miniconda3\\envs\\CZ\\Lib\\site-packages
+
 You are now all set to use modules from the package. 
 This is only a one time requirement as long as you dont move your env site-packages to a different location.
 If and when you do change the location, update the same in the abaqus environment file.

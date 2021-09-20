@@ -4,26 +4,34 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
 
 ## Software v1.0.0-a.1.0.0
 
-**Current Status:**  
+### a.1.0.0
+ 
 * Funcitons to generate input files for single element and non standard tests with and without substrates.
 * Sample test cases for single element test.
 * Module functions for generating parts required for standardized tests are available.
 * History output can be extracted from abaqus output data base.
 * Magnitudes of load and displacement extracted from the history output can be plotted.  
  
-**Future developments:**  
+### Features under development
+
 *  Functions to generate assemblies and input files for mixed mode characterization using standardized tests (DCB, ADCB, ASLB, SLB, ENF)
 *  Example standarized test cases.
 *  Extend package to include fortran based user element subroutines for the cohesive zone. 
 *  Class to define part properties
 
-## Documentation v1.0.0-a.1.0.0
+## Documentation v1.0.0-a.1.1.0
 
-**Current Status:**  
+### Docs - a.1.1.0
+
+Installation instructions updated to pass windows paths properly to abaqus.
+
+### Docs - a.1.0.0
+
 * Module and function documentation.
 * Base theme and template.
  
-**Future developments:**  
+### Docs - Features under development
+
 *  Pictorial representation of output bodies from part definitions and assembly definitions.
 *  Documentation and code citation information.
 *  Interactive options for authors.
