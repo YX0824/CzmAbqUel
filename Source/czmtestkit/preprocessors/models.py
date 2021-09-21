@@ -130,9 +130,12 @@ class testModel:
 			gB.loadE1 = self.loadE1
 		
 		## Generating parts
-		pT = gT.generate(m, 'Top')
-		pC = gC.generate(m, 'Cz')
-		pB = gB.generate(m, 'Bot')
+		gT.generate(m, 'Top')
+		pC = m.parts['Top']
+		gC.generate(m, 'Cz')
+		pC = m.parts['Cz']
+		gB.generate(m, 'Bot')
+		pC = m.parts['Bot']
 
 		# Assembly definition
 		a = m.rootAssembly
@@ -266,7 +269,8 @@ class testModel:
 		gC.meshSeed = self.meshSeed
 		
 		## Generating parts
-		pC = gC.generate(m, 'Cz')
+		gC.generate(m, 'Cz')
+		pC = m.parts['Cz']
 
 		# Assembly definition
 		a = m.rootAssembly
