@@ -58,23 +58,23 @@ class geometry:
 
 class testModel:
 	def __init__(self):
-		self.type = 'DCB' # Model type
+		self.type = 'NonStdUM' # Model type
 		self.lenTop = 1 # Length of top substrate
 		self.lenBot = 1 # Length of bottom substrate
 		self.width = 1 # Width of the Model
-		self.thickTop = 0.1 # Thickness of top substrate
-		self.thickBot = 0.1 # Thickness of bottom substrate
-		self.thickCz = 0.1 # Thickness of the cohesive zone
+		self.thickTop = 0.2 # Thickness of top substrate
+		self.thickBot = 0.2 # Thickness of bottom substrate
+		self.thickCz = 0.01 # Thickness of the cohesive zone
 		self.crack = 0 # crack length 
 		self.loadE1 = 0 # loading edge 1
 		self.loadE2 = 0 # loading edge 2 
-		self.BC = [0,0,1] # Displacement boundary condition on the load edge/face
-		self.matTypeTop = None # String to indicate material type of top substrate
-		self.matPropTop = [] # List of material properties of top substrate
-		self.matTypeBot = None # String to indicate material type of bottom substrate
-		self.matPropBot = [] # List of material properties of bottom substrate
-		self.matTypeCz = None # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
-		self.matPropCz = [] # List of material properties of bthe cohesive zone
+		self.BC = [0,0,2] # Displacement boundary condition on the load edge/face
+		self.matTypeTop = 'Iso' # String to indicate material type of top substrate
+		self.matPropTop = [100000,0.25] # List of material properties of top substrate
+		self.matTypeBot = 'Iso' # String to indicate material type of bottom substrate
+		self.matPropBot = [100000,0.25] # List of material properties of bottom substrate
+		self.matTypeCz = 'AbqMatLib' # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
+		self.matPropCz = [1000000,1,1,1,1,1] # List of material properties of bthe cohesive zone
 		self.meshSeed = [1,1,1] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]	
 		
 	def generate(self):
