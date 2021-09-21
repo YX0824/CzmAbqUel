@@ -39,7 +39,7 @@ class geometry:
 			p.MaterialOrientation(region=p.set['FullGeom'].cells, 
 				orientationType=GLOBAL, axis=AXIS_1, additionalRotationType=ROTATION_NONE, 
 				localCsys=None, fieldName='', stackDirection=STACK_3)
-		elif self.matType == 'AnIso':
+		elif self.matType == 'AbqMatLib':
 			# Anisotropic material defintion
 			elemType = LinearTsl(m, self.matProp, Name)
 			# Assigning mesh element stacking direction
