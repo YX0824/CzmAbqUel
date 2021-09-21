@@ -12,7 +12,7 @@ class geometry:
 		self.loadE2 = 0 # loading edge 2 
 		self.matType = None # String to indicate material type 
 		self.matProp = [] # List of material properties
-		self.meshSeed = [1,1,1] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]
+		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
 		self.LoadCase = [0,0,0] # List of boundary conditions to be applied
 
 	def generate(self, m, Name):
@@ -56,7 +56,7 @@ class geometry:
 		# Assigning edge seeds
 		p.seedEdgeBySize(edges=p.sets['X_Edges'].edges, size=self.meshSeed[0], deviationFactor=0.1, constraint=FINER)
 		p.seedEdgeBySize(edges=p.sets['Y_Edges'].edges, size=self.meshSeed[1], deviationFactor=0.1, constraint=FINER)
-		p.seedEdgeByNumber(edges=p.sets['Z_Edges'].edges, number=self.meshSeed[2], constraint=FINER)
+		p.seedEdgeBySize(edges=p.sets['Z_Edges'].edges, size=self.meshSeed[2], deviationFactor=0.1, constraint=FINER)
 		
 		# Generating mesh
 		p.generateMesh()
@@ -64,7 +64,9 @@ class geometry:
 		
 
 class testModel:
+
 	def __init__(self):
+
 		self.type = 'NonStdUM' # Model type
 		self.lenTop = 1 # Length of top substrate
 		self.lenBot = 1 # Length of bottom substrate
@@ -83,8 +85,8 @@ class testModel:
 		self.matPropBot = [100000,0.25] # List of material properties of bottom substrate
 		self.matTypeCz = 'AbqMatLib' # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
 		self.matPropCz = [1000000,1,1,1,1,1] # List of material properties of bthe cohesive zone
-		self.meshSeed = [1,1,1] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]	
-		
+		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
+
 	def generate(self):
 		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
