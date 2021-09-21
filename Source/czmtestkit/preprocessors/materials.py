@@ -28,7 +28,7 @@ def elasIso(m, Prop, Name):
     :param Prop: isotropic material (see abaqus documentation for isotropic type elastic material definition).
     :type Prop: list of dimensions (2, ) containing float, int
 
-    :param Name: name to be assigned to the material
+    :param Name: name of the part
     :type Name: str
 
     :Returns EleType: Type of mesh elements to be assigned with the material
@@ -40,8 +40,11 @@ def elasIso(m, Prop, Name):
     import mesh
     
     # Material definition
-    m.Material(name=Name)
-    m.materials[Name].Elastic(table=(tuple(Prop), ))
+    m.Material(name=Name+'Mat')
+    m.materials[Name+'Mat'].Elastic(table=(tuple(Prop), ))
+
+    # Section defintion
+	m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
     
     # Corresponding element types
     elemType1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD, 
@@ -83,8 +86,11 @@ def elasAnIso(m, Prop, Name):
     import mesh
 
     # Material definition
-    m.Material(name=Name)
-    m.materials[Name].Elastic(type=ENGINEERING_CONSTANTS, table=(tuple(Prop), ))
+    m.Material(name=Name+'Mat')
+    m.materials[Name+'Mat'].Elastic(type=ENGINEERING_CONSTANTS, table=(tuple(Prop), ))
+
+    # Section defintion
+	m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
     
     # Corresponding element types
     elemType1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD, 
@@ -121,22 +127,11 @@ def LinearTsl(m, Prop, Name):
 
     :type Prop: list of dimensions (6, ) containing float, int
 
-    :param Name: name to be assigned to the material
+    :param Name: Name of the part
     :type Name: str
 
     :Returns EleType: Type of mesh elements to be assigned with the material
     :type EleType: tuple
-
-    Parameters
-    ----------
-    m
-        Abaqus mdb model object to which the defined material is added.
-
-    Prop
-        List of floats of dimensions (6, ) in the following order: 
-
-    Name
-        String to indicate name of the material
 
     """
     # Importing Abaqus/CAE Release 2018 libraries for preprocessing
@@ -144,12 +139,15 @@ def LinearTsl(m, Prop, Name):
     import mesh
     
     # Material definition
-    m.Material(name=Name)
-    m.materials[Name].Elastic(type=TRACTION, table=((Prop[0], Prop[0], Prop[0]), ))
-    m.materials[Name].QuadsDamageInitiation(table=((Prop[1], Prop[2], Prop[2]), ))
-    m.materials[Name].quadsDamageInitiation.DamageEvolution(type=ENERGY, 
+    m.Material(name=Name+'Mat')
+    m.materials[Name+'Mat'].Elastic(type=TRACTION, table=((Prop[0], Prop[0], Prop[0]), ))
+    m.materials[Name+'Mat'].QuadsDamageInitiation(table=((Prop[1], Prop[2], Prop[2]), ))
+    m.materials[Name+'Mat'].quadsDamageInitiation.DamageEvolution(type=ENERGY, 
         mixedModeBehavior=BK, power=Prop[5], table=((Prop[3], Prop[4], Prop[4]), ))
     
+    ## Cohesive section defintion 
+    m.CohesiveSection(name=Name+'Sec', material=Name+'Mat', outOfPlaneThickness=None, response=TRACTION_SEPARATION)
+
     # Corresponding element types
     elemType1 = mesh.ElemType(elemCode=COH3D8, elemLibrary=STANDARD)
     elemType2 = mesh.ElemType(elemCode=COH3D6, elemLibrary=STANDARD)

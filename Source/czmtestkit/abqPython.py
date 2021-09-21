@@ -6,5 +6,5 @@
     Imports main functions for use with Abaqus cae environment scripts to run tests on czm.
 
 """
-from .preprocessors import *
+from .preprocessors.abaqustools import *
 from .postprocessors.odbExtract import hisOutLoadPoint
