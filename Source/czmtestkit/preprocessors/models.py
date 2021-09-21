@@ -2,6 +2,7 @@
 # Importing Abaqus/CAE Release 2018 libraries for preprocessing
 from abaqus import *
 from abaqusConstants import *
+from materials import *
 
 class geometry:
 	def __init__(self):
@@ -17,7 +18,6 @@ class geometry:
 	def generate(self, m, Name):
 		# Importing packages functions
 		from rectPart import partGeom
-		from materials import *
 
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import section
@@ -27,19 +27,20 @@ class geometry:
 		# Generating geometry 
 		partGeom(m, self, Name)
 		p = m.parts[Name]
-    
+		
+		Type = self.matType
 		# Material, section and elementtypes
-		if self.matType == 'Iso':
+		if Type=='Iso':
 			# Isotropic material defintion
 			elemType = elasIso(m, self.matProp, Name)
-		elif self.matType == 'AnIso':
+		elif Type=='AnIso':
 			# Anisotropic material defintion
 			elemType = elasAnIso(m, self.matProp, Name)
 			# Orientation assignment
 			p.MaterialOrientation(region=p.set['FullGeom'].cells, 
 				orientationType=GLOBAL, axis=AXIS_1, additionalRotationType=ROTATION_NONE, 
 				localCsys=None, fieldName='', stackDirection=STACK_3)
-		elif self.matType == 'AbqMatLib':
+		elif Type=='AbqMatLib':
 			# Anisotropic material defintion
 			elemType = LinearTsl(m, self.matProp, Name)
 			# Assigning mesh element stacking direction
