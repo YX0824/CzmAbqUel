@@ -75,6 +75,7 @@ class testModel:
 		self.crack = 0 # crack length 
 		self.loadE1 = 0 # loading edge 1
 		self.loadE2 = 0 # loading edge 2 
+		self.stepTime = 1 # Total step time
 		self.BC = [0,0,2] # Displacement boundary condition on the load edge/face
 		self.matTypeTop = 'Iso' # String to indicate material type of top substrate
 		self.matPropTop = [100000,0.25] # List of material properties of top substrate
@@ -131,11 +132,11 @@ class testModel:
 		
 		## Generating parts
 		gT.generate(m, 'Top')
-		pC = m.parts['Top']
+		pT = m.parts['Top']
 		gC.generate(m, 'Cz')
 		pC = m.parts['Cz']
 		gB.generate(m, 'Bot')
-		pC = m.parts['Bot']
+		pB = m.parts['Bot']
 
 		# Assembly definition
 		a = m.rootAssembly
@@ -149,7 +150,7 @@ class testModel:
 		iB = a.instances['pBot']
 		## Translating instances
 		iB.translate(vector=(self.lenTop - self.lenBot, 0.0, 0.0))
-		ic.translate(vector=(0.0, 0.0, self.thickBot))
+		ic.translate(vector=(self.crack, 0.0, self.thickBot))
 		iT.translate(vector=(0.0, 0.0, self.thickBot+self.thickCz))
 		## Tie constraints for the cohesive surfaces  
 		Mast = ic.sets['Top']
@@ -169,42 +170,42 @@ class testModel:
 		r = a.referencePoints
     
 		# Sets
-		a.Set(referencePoints=(r[rf1Id], ), name='FixedPoint')
-		a.Set(referencePoints=(r[rf2Id], ), name='LoadPoint')
+		a.Set(referencePoints=(r[rf2Id], ), name='FixedPoint')
+		a.Set(referencePoints=(r[rf1Id], ), name='LoadPoint')
 		i1 = iB
 		i2 = iT
 
 		# Assigning load sets and cases
 		if self.type in ['DCB', 'ADCB'] :
 			TLoadCase = self.BC
-			BLoadCase = -self.BC
+			BLoadCase = [-x for x in self.BC]
 			a.Set(faces=i1.sets['Back'].faces, name='FixedEnd')
 			a.Set(faces=i2.sets['Back'].faces, name='LoadEnd')
 		elif self.type == 'ENF':
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
-			a.Set(faces=i1.sets['LoadEnd1'].faces + i1.sets['LoadEnd2'].faces, name='FixedEnd')
-			a.Set(faces=i2.sets['LoadEnd'].faces, name='LoadEnd')
+			BLoadCase = [0 for x in self.BC]
+			a.Set(edges=i1.sets['LoadEnd1'].edges + i1.sets['LoadEnd2'].edges, name='FixedEnd')
+			a.Set(edges=i2.sets['LoadEnd'].edges, name='LoadEnd')
 		elif self.type in ['SLB','ASLB']:
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
-			a.Set(faces=i2.sets['LoadEnd2'].faces + i1.sets['LoadEnd'].faces, name='FixedEnd')
-			a.Set(faces=i2.sets['LoadEnd1'].faces, name='LoadEnd')
+			BLoadCase = [0 for x in self.BC]
+			a.Set(edges=i2.sets['LoadEnd2'].edges + i1.sets['LoadEnd'].edges, name='FixedEnd')
+			a.Set(edges=i2.sets['LoadEnd1'].edges, name='LoadEnd')
 		elif self.type == 'NonStdUM':
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
+			BLoadCase = [0 for x in self.BC]
 			a.Set(faces=i1.sets['Bot'].faces, name='FixedEnd')
 			a.Set(faces=i2.sets['Top'].faces, name='LoadEnd')
 		elif self.type == 'NonStdNM':
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
-			a.Set(faces=i1.sets['Bot'].faces+i2.sets['Back'].faces, name='FixedEnd')
-			a.Set(faces=i2.sets['Front'].faces, name='LoadEnd')
+			BLoadCase = [0 for x in self.BC]
+			a.Set(faces=i1.sets['Bot'].faces, edges=i2.sets['Back'].edges, name='FixedEnd')
+			a.Set(edges=i2.sets['Front'].edges, name='LoadEnd')
 
 		# Step
 		m.StaticStep(name='Step-1', previous='Initial', 
-			timePeriod=1, maxNumInc=1000000000, initialInc=0.001, minInc=1e-15, 
-			maxInc=0.01, nlgeom=ON)
+			timePeriod=self.stepTime, maxNumInc=1000000000, initialInc=self.stepTime*0.001, minInc=1e-15, 
+			maxInc=self.stepTime*0.01, nlgeom=ON)
 		m.steps['Step-1'].control.setValues(allowPropagation=OFF, 
 			resetDefaultValues=OFF, timeIncrementation=(4.0, 8.0, 9.0, 16.0, 10.0, 4.0, 
 			12.0, 15.0, 6.0, 3.0, 50.0))
@@ -282,19 +283,19 @@ class testModel:
 		# Assigning load sets and cases
 		if self.type == 'NonStdUM':
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
+			BLoadCase = [0 for x in self.BC]
 			a.Set(faces=ic.sets['Bot'].faces, name='FixedEnd')
 			a.Set(faces=ic.sets['Top'].faces, name='LoadEnd')
 		elif self.type == 'NonStdNM':
 			TLoadCase = self.BC
-			BLoadCase = 0*self.BC
+			BLoadCase = [0 for x in self.BC]
 			a.Set(faces=ic.sets['Bot'].faces+ic.sets['Back'].faces, name='FixedEnd')
 			a.Set(faces=ic.sets['Front'].faces, name='LoadEnd')
 
 		# Step
 		m.StaticStep(name='Step-1', previous='Initial', 
-			timePeriod=1, maxNumInc=1000000000, initialInc=0.001, minInc=1e-15, 
-			maxInc=0.01, nlgeom=ON)
+			timePeriod=self.stepTime, maxNumInc=1000000000, initialInc=self.stepTime*0.001, minInc=1e-15, 
+			maxInc=self.stepTime*0.01, nlgeom=ON)
 		m.steps['Step-1'].control.setValues(allowPropagation=OFF, 
 			resetDefaultValues=OFF, timeIncrementation=(4.0, 8.0, 9.0, 16.0, 10.0, 4.0, 
 			12.0, 15.0, 6.0, 3.0, 50.0))

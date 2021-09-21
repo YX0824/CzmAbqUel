@@ -90,15 +90,15 @@ def partGeom(m, geom, Name):
     if geom.crack==0:
         WithoutCrck(p, geom, Name)
     else :
-        if self.loadE1==0:
+        if geom.loadE1==0:
             WithCrck(p, geom, Name)
-        elif self.loadE1==geom.dim[0]*0.5:
-            if self.loadE2==0:
+        elif geom.loadE1==geom.dim[0]*0.5:
+            if geom.loadE2==0:
                 WithCrckP1T(p, geom, Name)     # Enf Top
             else:
                 WithCrckP2T(p, geom, Name)     # SLB Top
         else:
-            if self.loadE2==0:
+            if geom.loadE2==0:
                 WithCrckP1B(p, geom, Name)     # SLB Bottom
             else:
                 WithCrckP2B(p, geom, Name)     # Enf Bottom       
