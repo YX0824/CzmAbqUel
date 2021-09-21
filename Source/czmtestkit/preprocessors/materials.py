@@ -42,10 +42,10 @@ def elasIso(m, Prop, Name):
     # Material definition
     m.Material(name=Name+'Mat')
     m.materials[Name+'Mat'].Elastic(table=(tuple(Prop), ))
-
-    # Section defintion
-	m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
     
+    # Section defintion
+    m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
+
     # Corresponding element types
     elemType1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD, 
         secondOrderAccuracy=OFF, distortionControl=DEFAULT)
@@ -90,7 +90,7 @@ def elasAnIso(m, Prop, Name):
     m.materials[Name+'Mat'].Elastic(type=ENGINEERING_CONSTANTS, table=(tuple(Prop), ))
 
     # Section defintion
-	m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
+    m.HomogeneousSolidSection(name=Name+'Sec', material=Name+'Mat', thickness=1)
     
     # Corresponding element types
     elemType1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD, 
@@ -144,8 +144,8 @@ def LinearTsl(m, Prop, Name):
     m.materials[Name+'Mat'].QuadsDamageInitiation(table=((Prop[1], Prop[2], Prop[2]), ))
     m.materials[Name+'Mat'].quadsDamageInitiation.DamageEvolution(type=ENERGY, 
         mixedModeBehavior=BK, power=Prop[5], table=((Prop[3], Prop[4], Prop[4]), ))
-    
-    ## Cohesive section defintion 
+
+    ## Cohesive section defintion
     m.CohesiveSection(name=Name+'Sec', material=Name+'Mat', outOfPlaneThickness=None, response=TRACTION_SEPARATION)
 
     # Corresponding element types

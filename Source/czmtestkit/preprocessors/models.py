@@ -75,7 +75,7 @@ class testModel:
 		self.matPropBot = [] # List of material properties of bottom substrate
 		self.matTypeCz = None # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
 		self.matPropCz = [] # List of material properties of bthe cohesive zone
-		self.meshSeed = [] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]	
+		self.meshSeed = [1,1,1] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]	
 		
 	def generate(self):
 
@@ -155,7 +155,7 @@ class testModel:
 
 		# Reference points
 		rf1Id = a.ReferencePoint(point=(0,0,self.thickBot+self.thickTop+self.thickCz)).id
-		rf2Id = a.ReferencePoint(point=(0,0,0).id
+		rf2Id = a.ReferencePoint(point=(0,0,0)).id
 		r = a.referencePoints
     
 		# Sets
