@@ -121,7 +121,8 @@ class testModel:
 		gC.dim = [self.lenTop - self.crack, self.width, self.thickCz]
 		gC.matType = 'AbqMatLib'
 		gC.matProp = self.matPropCz
-		gC.meshSeed = self.meshSeed
+		gC.meshSeed[0:1] = self.meshSeed[0:1]
+		gC.meshSeed[2] = self.thickCz
 
 		if self.type == 'ENF':
 			gT.loadE1 = self.lenTop*0.5
@@ -269,7 +270,8 @@ class testModel:
 		gC.dim = [self.lenTop - self.crack, self.width, self.thickCz]
 		gC.matType = 'AbqMatLib'
 		gC.matProp = self.matPropCz
-		gC.meshSeed = self.meshSeed
+		gC.meshSeed[0:1] = self.meshSeed[0:1]
+		gC.meshSeed[2] = self.thickCz
 		
 		## Generating parts
 		gC.generate(m, 'Cz')
