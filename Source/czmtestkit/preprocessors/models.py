@@ -54,9 +54,9 @@ class geometry:
 		p.setElementType(elemTypes=elemType, regions=p.sets['FullGeom'])
 
 		# Assigning edge seeds
-		p.seedEdgeBySize(edges=p.sets['X_Edges'].edges, size=MeshSeedX, deviationFactor=0.1, constraint=FINER)
-		p.seedEdgeBySize(edges=p.sets['Y_Edges'].edges, size=MeshSeedY, deviationFactor=0.1, constraint=FINER)
-		p.seedEdgeByNumber(edges=p.sets['Z_Edges'].edges, number=MeshSeedZ, constraint=FINER)
+		p.seedEdgeBySize(edges=p.sets['X_Edges'].edges, size=self.meshSeed[0], deviationFactor=0.1, constraint=FINER)
+		p.seedEdgeBySize(edges=p.sets['Y_Edges'].edges, size=self.meshSeed[1], deviationFactor=0.1, constraint=FINER)
+		p.seedEdgeByNumber(edges=p.sets['Z_Edges'].edges, number=self.meshSeed[2], constraint=FINER)
 		
 		# Generating mesh
 		p.generateMesh()
