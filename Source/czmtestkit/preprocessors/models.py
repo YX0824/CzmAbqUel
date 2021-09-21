@@ -1,3 +1,8 @@
+
+# Importing Abaqus/CAE Release 2018 libraries for preprocessing
+from abaqus import *
+from abaqusConstants import *
+
 class geometry:
 	def __init__(self):
 		self.dim = [1,1,0] # dimensions [length, width, thickness]
@@ -12,6 +17,7 @@ class geometry:
 	def generate(self, m, Name):
 		# Importing packages functions
 		from rectPart import partGeom
+		from materials import *
 
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import section
@@ -78,16 +84,16 @@ class testModel:
 		self.meshSeed = [1,1,1] # List of mesh seed properties containing [size of mesh along x, size of mesh along y, number of elements along z]	
 		
 	def generate(self):
-
+		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly
 		import step
 		import interaction
 		import load
 		import job
-
+		
 		# Assigning a model
-		self.m = mdb.models['Model-1']
+		m = mdb.models['Model-1']
 
 		# Generating geometries
 		## Defining top substrate
@@ -240,7 +246,7 @@ class testModel:
 			ReDefCE(self.matPropCz)
 
 	def SinEle(self):
-
+		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly
 		import step
@@ -249,7 +255,7 @@ class testModel:
 		import job
 
 		# Assigning a model
-		self.m = mdb.models['Model-1']
+		m = mdb.models['Model-1']
 		
 		## Defining cohesive zone
 		gC = geometry()
