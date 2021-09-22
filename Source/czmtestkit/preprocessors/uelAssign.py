@@ -19,8 +19,21 @@ def ReDefCE(CzMat):
     
     Edits the input file by redefining cohesive zone elements as user defined elements and supresses assigned abaqus section.
     
-    :param CzMat: Cohesive zone material propoerties in the following order: Stiffness, Nominal stress mode-1, Nominal stress mode-2, Fracture toughness mode-1, Fracture toughness mode-2, B-K Parameter.
-    :type CzMat: list containing float
+    :param CzMat: cohesive zone material properties in the order
+
+        :[0] (float): Stiffness
+
+        :[1] (float): Nominal stress mode-1
+
+        :[2] (float): Nominal stress mode-2
+
+        :[3] (float): Fracture toughness mode-1
+
+        :[4] (float): Fracture toughness mode-2
+
+        :[5] (float): B-K Parameter
+
+    :type CzMat: List
     """
     import numpy as np
     import job

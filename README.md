@@ -2,7 +2,13 @@
 
 This repository has python package ``czmtestkit`` developed for generating abaqus cae models required to test abaqus user subroutines for implementing cohesive zone models as well as post processing the results.
 
-## Software v1.0.0-a.1.0.0
+## Software v1.0.0-a.2.0.0
+
+### a.2.0.0 
+
+*  Classes to define part and model properties.
+*  Functions to generate assemblies and input files for mixed mode characterization using standardized tests. (DCB, ADCB, ASLB, SLB, ENF)
+*  Example standarized test cases.
 
 ### a.1.0.0
  
@@ -14,12 +20,15 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
  
 ### Features under development
 
-*  Functions to generate assemblies and input files for mixed mode characterization using standardized tests (DCB, ADCB, ASLB, SLB, ENF)
-*  Example standarized test cases.
-*  Extend package to include fortran based user element subroutines for the cohesive zone. 
-*  Class to define part properties
+*  Read class properties from dictonary.
+*  Create input class to write properties to a dictonary.
+*  Extend package to include fortran based user element subroutines for the cohesive zone.
 
-## Documentation v1.0.0-a.1.1.0
+## Documentation v1.0.0-a.2.0.0
+
+### Docs - a.2.0.0
+
+* geometry and testModel classes for elementary ans standardized tests,
 
 ### Docs - a.1.1.0
 

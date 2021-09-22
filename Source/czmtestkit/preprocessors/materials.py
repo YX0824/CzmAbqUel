@@ -22,8 +22,8 @@ def elasIso(m, Prop, Name):
      
     Define isotropic elastic material and corresponding mesh element types.
 
-    :param m: Abaqus model requesting the material.
-    :type m: mdb object
+    :param m: Abaqus mdb model
+    :type m: object
 
     :param Prop: isotropic material (see abaqus documentation for isotropic type elastic material definition).
     :type Prop: list of dimensions (2, ) containing float, int
@@ -31,7 +31,7 @@ def elasIso(m, Prop, Name):
     :param Name: name of the part
     :type Name: str
 
-    :Returns EleType: Type of mesh elements to be assigned with the material
+    :Return EleType: Type of mesh elements to be assigned with the material
     :type EleType: tuple
 
     """
@@ -68,8 +68,8 @@ def elasAnIso(m, Prop, Name):
      
     Define elastic material using engineering constants and corresponding mesh element types.
 
-    :param m: Abaqus model requesting the material.
-    :type m: mdb object
+    :param m: Abaqus mdb model
+    :type m: object
 
     :param Prop: anisotropic material (see abaqus documentation for elastic material defined using engineering constants).
     :type Prop: list of dimensions (9, ) containing float, int
@@ -77,7 +77,7 @@ def elasAnIso(m, Prop, Name):
     :param Name: name to be assigned to the material
     :type Name: str
 
-    :Returns EleType: Type of mesh elements to be assigned with the material
+    :Return EleType: Type of mesh elements to be assigned with the material
     :type EleType: tuple
 
     """
@@ -112,25 +112,31 @@ def LinearTsl(m, Prop, Name):
     """
     :For use with: Abaqus cae environment
      
-    Define damage material using linear TSL and corresponding mesh element types. 
+    Define damage material using linear TSL and corresponding mesh element types.
 
-    :param m: Abaqus model requesting the material.
-    :type m: mdb object
-
-    :param Prop: cohesive zone material properties in the order::
-                    1. Stiffness
-                    2. Nominal stress mode-1
-                    3. Nominal stress mode-2
-                    4. Fracture toughness mode-1
-                    5. Fracture toughness mode-2
-                    6. B-K Parameter.
-
-    :type Prop: list of dimensions (6, ) containing float, int
+    :param m: Abaqus mdb model
+    :type m: object
 
     :param Name: Name of the part
     :type Name: str
 
-    :Returns EleType: Type of mesh elements to be assigned with the material
+    :param Prop: cohesive zone material properties in the order
+
+        :[0] (float): Stiffness
+
+        :[1] (float): Nominal stress mode-1
+
+        :[2] (float): Nominal stress mode-2
+
+        :[3] (float): Fracture toughness mode-1
+
+        :[4] (float): Fracture toughness mode-2
+
+        :[5] (float): B-K Parameter
+
+    :type Prop: List
+
+    :return EleType: Type of mesh elements to be assigned with the material
     :type EleType: tuple
 
     """

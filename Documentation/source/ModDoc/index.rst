@@ -13,6 +13,3 @@ Packages modules
 	Abaqus cae python environment module <AbqPy.rst>
 	
 	CZ python environment module <CzPy.rst>
-
-..
-	List of all modules <Dev.rst>

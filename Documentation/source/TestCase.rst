@@ -6,7 +6,8 @@ Test Cases
    :maxdepth: 2  
    :name: TestCaseToc
 
-	Single element test <Examples/SinEleAbq.rst>
+..
+	Single element test
 
 ..
 	Four element CZ with substrates

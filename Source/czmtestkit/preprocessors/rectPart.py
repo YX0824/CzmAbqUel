@@ -25,48 +25,53 @@ def partGeom(m, geom, Name):
        :header-rows: 1
         
        * - Crack length
-         - Load End 1
-         - Load End 2
+         - Load Edge 1
+         - Load Edge 2
          - Part type
-
        * - 0 
          - 0
          - 0
          - Unpartitioned solid
-
        * - > 0 
          - 0
          - 0
          - DCB, ADCB
-
        * - > 0
          - Half length
          - 0
          - ENF top substrate
-
        * - > 0
          - > Half length
          - > 0
          - ENF bottom substrate  
-
        * - > 0
          - Half length
          - > 0
          - SLB, ASLB top substrate
-
        * - > 0
          - > Half length
          - 0
-         - SLB, ASLB bottom substrate       
-    
-    :param m: Base abaqus model.
-    :type m: object    
-    
-    :param geom: Part geometry and property object
-    :type geom: object
+         - SLB, ASLB bottom substrate  
+         
+    ..
 
     :param Name: Name of the Part
     :type Name: str
+
+    :param m: Abaqus mdb model
+    :type m: object
+
+    :param geom: Part geometry and property object
+
+        :geom.dim (List): part dimensions
+
+        :geom.crack (float): crack length < geom.dim[0]
+
+        :geom.loadE1 (float): distance of load edge 1 from geom.dim[0]
+
+        :geom.loadE2 (float): distance of load edge 2 from part origin
+
+    :type geom: object
     
     """	
     import part

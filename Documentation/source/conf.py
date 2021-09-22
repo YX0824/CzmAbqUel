@@ -23,7 +23,7 @@ copyright = '2021, Nanditha Mudunuru'
 author = 'Nanditha Mudunuru, Miguel Bessa, Albert Turon'
 
 # The full version, including alpha/beta/rc tags
-release = 'v1.0.0-a'
+release = 'v1.0.0-a.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,7 +44,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', '_templates','README.md']
+exclude_patterns = ['_build', '_templates','README.md','Examples']
 
 
 # -- Options for HTML output -------------------------------------------------

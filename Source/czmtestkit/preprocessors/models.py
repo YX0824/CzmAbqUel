@@ -2,9 +2,50 @@
 # Importing Abaqus/CAE Release 2018 libraries for preprocessing
 from abaqus import *
 from abaqusConstants import *
-from materials import *
+from .materials import *
 
 class geometry:
+	"""
+	Class for 3D cuboid part attributes for elementary and standardized tests.
+
+	:param dim: Length of top substrate
+
+		:[0] (float): Part length 
+
+		:[1] (float): Part width 
+
+		:[2] (float): Part height
+
+	:type dim: List
+
+	:param crack: crack length
+	:type crack: float
+
+	:param loadE1: loading edge 1
+	:type loadE1: float
+
+	:param loadE2: loading edge 2 
+	:type loadE2: float
+
+	:param LoadCase: Displacement boundary condition on the load edge/face
+	:type LoadCase: List
+
+	:param matType: Material type of the part from the following list
+
+		:'Iso': Isotropic elastic material from abaqus material library
+
+		:'AnIso': Ansotropic elastic material based on engineering constants from abaqus material library
+
+		:'AbqMatLib': Traction seperation based damage material 
+
+	:type matType: str
+
+	:param matProp: Material properties of the part
+	:type matProp: List
+
+	:param meshSeed: Mesh seed by size along the 3 directions
+	:type meshSeed: List
+	"""
 	def __init__(self):
 		self.dim = [1,1,0] # dimensions [length, width, thickness]
 		self.crack = 0 # crack length 
@@ -16,6 +57,17 @@ class geometry:
 		self.LoadCase = [0,0,0] # List of boundary conditions to be applied
 
 	def generate(self, m, Name):
+		"""
+		:For use with: Abaqus cae environment    
+		Generates the part using partGeom function from rectPart module using instance attributes.
+
+		:param m: base abaqus model for the part
+		:type m: object
+
+		:param Name: Name of the part being generated
+		:type Name: str
+
+		"""
 		# Importing packages functions
 		from rectPart import partGeom
 
@@ -64,6 +116,81 @@ class geometry:
 		
 
 class testModel:
+	"""
+	Main class for generating elementary and standardized test input files.
+
+	:param type: Model type from the following list
+
+		:'NonStdUM': Single element with substrates under uniform load 
+
+		:'NonStdNM': Single element with substrates under nonuniform load 
+
+		:'DCB': Standard mode-1 test
+
+		:'ADCB': Standard predominantly mode-1 mixed-mode test 
+
+		:'ASLB': Standard mixed-mode test
+
+		:'SLB': Standard predominantly mode-2 mixed-mode test
+
+		:'ENF': Standard mode-2 test
+
+	:type type: str
+
+	:param lenTop: Length of top substrate
+	:type lenTop: float
+
+	:param lenBot: Length of bottom substrate
+	:type lenTop: float
+
+	:param width: Width of the specimen
+	:type lenTop: float
+
+	:param thickTop: Thickness of top substrate
+	:type lenTop: float
+
+	:param thickBot: Thickness of bottom substrate
+	:type lenTop: float
+
+	:param thickCz: Thickness of the cohesive zone
+	:type lenTop: float
+
+	:param crack: crack length
+	:type lenTop: float
+
+	:param loadE1: loading edge 1
+	:type lenTop: float
+
+	:param loadE2: loading edge 2 
+	:type lenTop: float
+
+	:param stepTime: Total step time
+	:type lenTop: float
+
+	:param BC: Displacement boundary condition on the load edge/face
+	:type lenTop: List
+
+	:param matTypeTop: String to indicate material type of top substrate
+	:type lenTop: str
+
+	:param matPropTop: List of material properties of top substrate
+	:type lenTop: List
+
+	:param matTypeBot: String to indicate material type of bottom substrate
+	:type lenTop: str
+
+	:param matPropBot: List of material properties of bottom substrate
+	:type lenTop: List
+
+	:param matTypeCz: String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
+	:type lenTop: str
+
+	:param matPropCz: List of material properties of bthe cohesive zone
+	:type lenTop: List
+
+	:param meshSeed: List of mesh seed by side along the 3 directions
+	:type lenTop: List
+	"""
 
 	def __init__(self):
 
@@ -88,6 +215,14 @@ class testModel:
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
 
 	def generate(self):
+		"""
+		:For use with: Abaqus cae environment    
+		Generates the input file for the model with substrates and a cohesive zone using defintions from instance attributes.
+
+		:return Job: ASCII data file with keyword and data lines to run the simulation.
+		:type Job: .inp
+
+		"""
 		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly
@@ -254,7 +389,14 @@ class testModel:
 			ReDefCE(self.matPropCz)
 
 	def SinEle(self):
-		
+		"""
+		:For use with: Abaqus cae environment    
+		Generates the input file for the model with only the cohesive zone using defintions from instance attributes.
+
+		:return Job: ASCII data file with keyword and data lines to run the simulation.
+		:type Job: .inp
+
+		"""
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly
 		import step
