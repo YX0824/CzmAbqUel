@@ -13,7 +13,7 @@ from abaqusConstants import *
 
 
 
-def ReDefCE(CzMat):
+def ReDefCE(CzMat, SubRout):
     """
     :For use with: Abaqus cae environment     
     
@@ -34,6 +34,10 @@ def ReDefCE(CzMat):
         :[5] (float): B-K Parameter
 
     :type CzMat: List
+
+    :param SubRout: relative path to the user subroutine
+    :type SubRout: str
+
     """
     import numpy as np
     import job
@@ -99,6 +103,6 @@ def ReDefCE(CzMat):
     del mdb.jobs['Job']
 
     # Creating new defintion using the .inp file
-    mdb.JobFromInputFile(name='Job', 
-        inputFileName='Job.inp', multiprocessingMode=DEFAULT, numCpus=4, 
-        numDomains=4, numGPUs=0)
+    mdb.JobFromInputFile(name='Job', inputFileName='Job.inp',
+        userSubroutine=SubRout, multiprocessingMode=DEFAULT,  
+        numCpus=4, numDomains=4, numGPUs=0)

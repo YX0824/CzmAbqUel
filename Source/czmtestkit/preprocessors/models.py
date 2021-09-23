@@ -182,7 +182,7 @@ class testModel:
 	:param matPropBot: List of material properties of bottom substrate
 	:type lenTop: List
 
-	:param matTypeCz: String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
+	:param matTypeCz: Relative path to the user subroutine or 'AbqMatLib' for implementing energy based linear traction separation law from abaqus material library.
 	:type lenTop: str
 
 	:param matPropCz: List of material properties of bthe cohesive zone
@@ -230,6 +230,9 @@ class testModel:
 		import interaction
 		import load
 		import job
+
+		# Importing module function
+		from .uelAssign import ReDefCE
 		
 		# Assigning a model
 		m = mdb.models['Model-1']
@@ -370,7 +373,7 @@ class testModel:
 
 		# Output request
 		m.historyOutputRequests['H-Output-1'].setValues(variables=(
-			'UT', 'RT'), region=a.sets['LoadPoint'], timeInterval=0.01, sectionPoints=DEFAULT, rebar=EXCLUDE)
+			'UT', 'RT'), region=a.sets['LoadPoint'], timeInterval=self.stepTime*0.01, sectionPoints=DEFAULT, rebar=EXCLUDE)
 		m.fieldOutputRequests['F-Output-1'].setValues( frequency=10, variables=('S', 'U', 'RF'))
     
 		# Job 
@@ -386,7 +389,7 @@ class testModel:
 		mdb.jobs['Job'].writeInput(consistencyChecking=OFF)
 		## Editing .inp to define CZ as user elements
 		if self.matTypeCz!='AbqMatLib':
-			ReDefCE(self.matPropCz)
+			ReDefCE(self.matPropCz, self.matTypeCz)
 
 	def SinEle(self):
 		"""
@@ -403,6 +406,9 @@ class testModel:
 		import interaction
 		import load
 		import job
+
+		# Importing module function
+		from .uelAssign import ReDefCE
 
 		# Assigning a model
 		m = mdb.models['Model-1']
@@ -474,4 +480,4 @@ class testModel:
 		mdb.jobs['Job'].writeInput(consistencyChecking=OFF)
 		## Editing .inp to define CZ as user elements
 		if self.matTypeCz!='AbqMatLib':
-			ReDefCE(self.matPropCz)
+			ReDefCE(self.matPropCz, self.matTypeCz)

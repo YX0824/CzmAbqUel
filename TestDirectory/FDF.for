@@ -132,6 +132,8 @@ C       UPDATING OUTPUT VARIABLES
 	  END DO
 	  RHS(:,1) = RHS(:,1)*DETJ
 	  AMATRX = AMATRX*DETJ
+      PRINT *, 'TIME(2) = ', TIME(2)
+      PRINT *, 'GIP = ', GIP
       IF (NCOUNT.EQ.NINTP) THEN
           SVARS(NSVARS) = ZERO
       END IF
