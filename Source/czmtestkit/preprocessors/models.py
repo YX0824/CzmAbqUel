@@ -45,6 +45,9 @@ class geometry:
 
 	:param meshSeed: Mesh seed by size along the 3 directions
 	:type meshSeed: List
+
+	:param TabPosition: Location of tab for DCB and ADCB
+	:type TabPosition: float <= 1
 	"""
 	def __init__(self):
 		self.dim = [1,1,0] # dimensions [length, width, thickness]
@@ -55,6 +58,7 @@ class geometry:
 		self.matProp = [] # List of material properties
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
 		self.LoadCase = [0,0,0] # List of boundary conditions to be applied
+		self.TabPosition = 0 # Location of load for DCB and ADCB
 
 	def generate(self, m, Name):
 		"""
@@ -190,6 +194,9 @@ class testModel:
 
 	:param meshSeed: List of mesh seed by side along the 3 directions
 	:type lenTop: List
+
+	:param TabPosition: Location of tab for DCB and ADCB
+	:type TabPosition: float <= 1
 	"""
 
 	def __init__(self):
@@ -213,6 +220,7 @@ class testModel:
 		self.matTypeCz = 'AbqMatLib' # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
 		self.matPropCz = [1000000,1,1,1,1,1] # List of material properties of bthe cohesive zone
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
+		self.TabPosition = 0.5 # Location of load for DCB and ADCB
 
 	def generate(self):
 		"""
@@ -245,6 +253,7 @@ class testModel:
 		gT.matType = self.matTypeTop
 		gT.matProp = self.matPropTop
 		gT.meshSeed = self.meshSeed
+		gT.TabPosition = 0.5
 		
 		## Defining bot substrate
 		gB = geometry()
@@ -253,13 +262,15 @@ class testModel:
 		gB.matType = self.matTypeBot
 		gB.matProp = self.matPropBot
 		gB.meshSeed = self.meshSeed
+		gB.TabPosition = 0.5
 		
 		## Defining cohesive zone
 		gC = geometry()
 		gC.dim = [self.lenTop - self.crack, self.width, self.thickCz]
 		gC.matType = 'AbqMatLib'
 		gC.matProp = self.matPropCz
-		gC.meshSeed[0:1] = self.meshSeed[0:1]
+		gC.meshSeed[0] = self.meshSeed[0]
+		gC.meshSeed[1] = self.meshSeed[1]
 		gC.meshSeed[2] = self.thickCz
 
 		if self.type == 'ENF':
@@ -293,6 +304,8 @@ class testModel:
 		iB.translate(vector=(self.lenTop - self.lenBot, 0.0, 0.0))
 		ic.translate(vector=(self.crack, 0.0, self.thickBot))
 		iT.translate(vector=(0.0, 0.0, self.thickBot+self.thickCz))
+		i1 = iB
+		i2 = iT
 		## Tie constraints for the cohesive surfaces  
 		Mast = ic.sets['Top']
 		Slav = iT.sets['Bot']
@@ -305,43 +318,74 @@ class testModel:
 			positionToleranceMethod=COMPUTED, adjust=OFF, tieRotations=OFF, 
 			constraintEnforcement=NODE_TO_SURFACE, thickness=ON)
 
-		# Reference points
-		rf1Id = a.ReferencePoint(point=(0,0,self.thickBot+self.thickTop+self.thickCz)).id
-		rf2Id = a.ReferencePoint(point=(0,0,0)).id
-		r = a.referencePoints
-    
-		# Sets
-		a.Set(referencePoints=(r[rf2Id], ), name='FixedPoint')
-		a.Set(referencePoints=(r[rf1Id], ), name='LoadPoint')
-		i1 = iB
-		i2 = iT
-
 		# Assigning load sets and cases
 		if self.type in ['DCB', 'ADCB'] :
 			TLoadCase = self.BC
 			BLoadCase = [-x for x in self.BC]
-			a.Set(faces=i1.sets['Back'].faces, name='FixedEnd')
-			a.Set(faces=i2.sets['Back'].faces, name='LoadEnd')
+			u_con = [SET, UNSET, SET]
+			a.Set(edges=i1.sets['Back'].edges, name='FixedEnd')
+			a.Set(edges=i2.sets['Front'].edges, name='LoadEnd')
+			# Reference points
+			rf1Id = a.ReferencePoint(point=(0,0,self.thickBot+self.thickTop+self.thickCz)).id
+			rf2Id = a.ReferencePoint(point=(0,0,0)).id
+
 		elif self.type == 'ENF':
-			TLoadCase = self.BC
+			TLoadCase = [-x for x in self.BC]
 			BLoadCase = [0 for x in self.BC]
+			u_con = [SET, SET, SET]
 			a.Set(edges=i1.sets['LoadEnd1'].edges + i1.sets['LoadEnd2'].edges, name='FixedEnd')
 			a.Set(edges=i2.sets['LoadEnd'].edges, name='LoadEnd')
+			## Hard contact 
+			m.ContactProperty('HardContact')
+			m.interactionProperties['HardContact'].NormalBehavior(
+			    pressureOverclosure=HARD, allowSeparation=ON, 
+			    constraintEnforcementMethod=DEFAULT)
+			m.interactionProperties['HardContact'].TangentialBehavior(
+			    formulation=FRICTIONLESS)
+			region1=i1.surfaces['Contact']
+			region2=i2.surfaces['Contact']
+			m.SurfaceToSurfaceContactStd(name='CrackContact', 
+			    createStepName='Initial', master=region1, slave=region2, sliding=FINITE, 
+			    thickness=ON, interactionProperty='HardContact', adjustMethod=NONE, 
+			    initialClearance=OMIT, datumAxis=None, clearanceRegion=None)
+			# Reference points
+			rf1Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,self.thickBot+self.thickTop+self.thickCz)).id
+			rf2Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,0)).id
+
 		elif self.type in ['SLB','ASLB']:
-			TLoadCase = self.BC
+			TLoadCase = [-x for x in self.BC]
 			BLoadCase = [0 for x in self.BC]
+			u_con = [SET, SET, SET]
 			a.Set(edges=i2.sets['LoadEnd2'].edges + i1.sets['LoadEnd'].edges, name='FixedEnd')
 			a.Set(edges=i2.sets['LoadEnd1'].edges, name='LoadEnd')
+			# Reference points
+			rf1Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,self.thickBot+self.thickTop+self.thickCz)).id
+			rf2Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,0)).id
+
 		elif self.type == 'NonStdUM':
 			TLoadCase = self.BC
 			BLoadCase = [0 for x in self.BC]
+			u_con = [SET, SET, SET]
 			a.Set(faces=i1.sets['Bot'].faces, name='FixedEnd')
 			a.Set(faces=i2.sets['Top'].faces, name='LoadEnd')
+			# Reference points
+			rf1Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,self.thickBot+self.thickTop+self.thickCz)).id
+			rf2Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,0)).id
+
 		elif self.type == 'NonStdNM':
 			TLoadCase = self.BC
 			BLoadCase = [0 for x in self.BC]
+			u_con = [SET, SET, SET]
 			a.Set(faces=i1.sets['Bot'].faces, edges=i2.sets['Back'].edges, name='FixedEnd')
 			a.Set(edges=i2.sets['Front'].edges, name='LoadEnd')
+			# Reference points
+			rf1Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,self.thickBot+self.thickTop+self.thickCz)).id
+			rf2Id = a.ReferencePoint(point=(self.lenTop*0.5,self.width*0.5,0)).id
+    
+		# Sets
+		r = a.referencePoints
+		a.Set(referencePoints=(r[rf2Id], ), name='FixedPoint')
+		a.Set(referencePoints=(r[rf1Id], ), name='LoadPoint')
 
 		# Step
 		m.StaticStep(name='Step-1', previous='Initial', 
@@ -352,23 +396,21 @@ class testModel:
 			12.0, 15.0, 6.0, 3.0, 50.0))
 
 		# Coupling
-		u_con = [ON,ON]
 		m.Coupling(name='Constraint-11', controlPoint=a.sets['FixedPoint'], 
 			surface=a.sets['FixedEnd'], influenceRadius=WHOLE_SURFACE, couplingType=KINEMATIC, 
-			localCsys=None, u1=u_con[0], u2=u_con[0], u3=u_con[0], ur1=u_con[1], ur2=u_con[1], ur3=u_con[1])
+			localCsys=None, u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
 		m.Coupling(name='Constraint-12', controlPoint=a.sets['LoadPoint'], 
 			surface=a.sets['LoadEnd'], influenceRadius=WHOLE_SURFACE, couplingType=KINEMATIC, 
-			localCsys=None, u1=u_con[0], u2=u_con[0], u3=u_con[0], ur1=u_con[1], ur2=u_con[1], ur3=u_con[1])
+			localCsys=None, u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
 
 		# Boundary conditions
-		u_con = [SET, UNSET]
 		m.DisplacementBC(name='BC-1', createStepName='Step-1', 
 			region=a.sets['FixedPoint'], u1=BLoadCase[0], u2=BLoadCase[1], u3=BLoadCase[2], 
-			ur1=u_con[0],ur2=u_con[0], ur3=u_con[1], amplitude=UNSET, distributionType=UNIFORM,
+			ur1=u_con[0],ur2=u_con[1], ur3=u_con[2], amplitude=UNSET, distributionType=UNIFORM,
 			fieldName='', localCsys=None)  
 		m.DisplacementBC(name='BC-2', createStepName='Step-1', 
 			region=a.sets['LoadPoint'], u1=TLoadCase[0], u2=TLoadCase[1], u3=TLoadCase[2], 
-			ur1=u_con[0],ur2=u_con[0], ur3=u_con[1], amplitude=UNSET, distributionType=UNIFORM,
+			ur1=u_con[0],ur2=u_con[1], ur3=u_con[2], amplitude=UNSET, distributionType=UNIFORM,
 			fieldName='', localCsys=None)
 
 		# Output request

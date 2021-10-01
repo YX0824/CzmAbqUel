@@ -191,20 +191,30 @@ def WithCrck(p, geom, Name):
     v,e,f,c = p.vertices, p.edges, p.faces, p.cells
     Dp = p.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE, offset=cr).id
     p.PartitionCellByDatumPlane(datumPlane=d[Dp], cells=c.findAt(((l*0.5, b*0.5, h*0.5), )))
-    d = p.datums
-    v,e,f,c = p.vertices, p.edges, p.faces, p.cells
+    ## Load edges
+    selectF = e.findAt(((0.0, b*0.5, h),))
+    selectB = e.findAt(((0.0, b*0.5, 0.0),))
+    if geom.TabPosition==0.5:
+        Dp = p.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE, offset=0.5*h).id
+        p.PartitionFaceByDatumPlane(datumPlane=d[Dp], faces=f.findAt(((0, b*0.5, h*0.5), )))
+        ## Load edges
+        selectF = e.findAt(((0.0, b*0.5, h*0.5),))
+        selectB = e.findAt(((0.0, b*0.5, h*0.5),))
 
     MidLen = (l+cr)*0.5
     # Defining useful sets
+    ## Load edges
+    p.Set(edges=selectF, name='Front')
+    p.Set(edges=selectB, name='Back')
+    ## Top edge 
+    selectT = f.findAt(((MidLen, b*0.5, h),))
+    p.Set(faces=selectT, name='Top')
+    ## Bottom edge
+    selectB = f.findAt(((MidLen, b*0.5, 0.0),))
+    p.Set(faces=selectB, name='Bot')
+    ## Full Geom
     p.Set(cells=c, name='FullGeom')
-    select = f.findAt(((MidLen, b*0.5, h),))
-    p.Set(faces=select, name='Top')
-    select = f.findAt(((MidLen, b*0.5, 0.0),))
-    p.Set(faces=select, name='Bot')
-    select = f.findAt(((l, b*0.5, h*0.5),))
-    p.Set(faces=select, name='Front')
-    select = f.findAt(((0.0, b*0.5, h*0.5),))
-    p.Set(faces=select, name='Back')
+    ## Mesh seed edges
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
         ((MidLen, b, 0), ), ((MidLen, b, h), ),
         ((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
@@ -216,7 +226,7 @@ def WithCrck(p, geom, Name):
     p.Set(edges=select, name='Y_Edges')
     select = e.findAt(((l, b, h*0.5), ), ((l, 0, h*0.5), ),
         ((cr, b, h*0.5), ), ((cr, 0, h*0.5), ),
-        ((0, b, h*0.5), ), ((0, 0, h*0.5), ))
+        ((0, b, h*0.25), ), ((0, 0, h*0.75), ))
     p.Set(edges=select, name='Z_Edges')  
 
     return
@@ -358,6 +368,10 @@ def WithCrckP1T(p, geom, Name):
         ((0, b, h*0.5), ), ((0, 0, h*0.5), ))
     p.Set(edges=select, name='Z_Edges')  
 
+    # Contact surface
+    select = f.findAt(((cr*0.5, b*0.5, 0.0),))
+    p.Surface(side1Faces=select, name='Contact')
+
     return
 
 
@@ -433,6 +447,10 @@ def WithCrckP2B(p, geom, Name):
         ((cr, b, h*0.5), ), ((cr, 0, h*0.5), ),
         ((0, b, h*0.5), ), ((0, 0, h*0.5), ))
     p.Set(edges=select, name='Z_Edges')  
+
+    # Contact surface
+    select = f.findAt(((cr*0.5, b*0.5, h),))
+    p.Surface(side1Faces=select, name='Contact')
 
     return
 
