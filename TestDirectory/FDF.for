@@ -58,101 +58,101 @@ C     DECLARING INTERNAL VARIABLES
      1 N(3, 12), B1(3, 12), B2(3, 12), T1(3,1), T2(3,1), T3(3,1),    
      2 R(3,3), W(4), CP(2), IP(2,4), DG(3,24), DR(3,24), GIP(3,1), TAU(3),
      3 DA(3,1), DETJ, DTAU(3,3), SVARIP(5), ZERO, ONE, HALF, TWO
-	  INTEGER NINTP, IT, IT1, NCOUNT
-	  EXTERNAL GINTP, ROTVEC, TSL, DRFDF, CROSS
-	  PARAMETER (ZERO = 0.D0, ONE = 1.D0, HALF=0.5D0, TWO=2.D0)
+      INTEGER NINTP, IT, IT1, NCOUNT
+      EXTERNAL GINTP, ROTVEC, TSL, DRFDF, CROSS
+      PARAMETER (ZERO = 0.D0, ONE = 1.D0, HALF=0.5D0, TWO=2.D0)
 C     INITIALIZING INTERNAL VARIABLES
       NINTP = 4
-      X = U
-	  DO IT = 1,8
-          DO IT1=1,3
-              X((IT-1)*3+IT1,1) = X((IT-1)*3+IT1,1)+COORDS(IT1,IT)
-		  END DO
-	  END DO
-	  I = ZERO
-	  DO IT=1,3
-	      I(IT,IT)=ONE
-	  END DO
-	  L = ZERO
-	  M = ZERO
-	  DO IT=1,12
-	    L(IT,IT) = -ONE
-	    L(IT,IT+12) = ONE
-	    M(IT,IT) = HALF
-	    M(IT,IT+12) = HALF
-	  END DO
-	  DA = ZERO
-	  W = ZERO
-	  CP = ZERO
-	  IP = ZERO
-	  N = ZERO
-	  B1 = ZERO
-	  B2 = ZERO
-	  R = ZERO
-	  DR = ZERO
+      X = RESHAPE(COORDS,(/24,1/))
+      X = X + U
+      PRINT *, 'X = ', X
+C      DO IT = 1,8
+C          DO IT1=1,3
+C              X((IT-1)*3+IT1,1) = X((IT-1)*3+IT1,1)+COORDS(IT1,IT)
+C          END DO
+C      END DO
+      I = ZERO
+      DO IT=1,3
+          I(IT,IT)=ONE
+      END DO
+      L = ZERO
+      M = ZERO
+      DO IT=1,12
+          L(IT,IT) = -ONE
+          L(IT,IT+12) = ONE
+          M(IT,IT) = HALF
+          M(IT,IT+12) = HALF
+      END DO
+      DA = ZERO
+      W = ZERO
+      CP = ZERO
+      IP = ZERO
+      N = ZERO
+      B1 = ZERO
+      B2 = ZERO
+      R = ZERO
+      DR = ZERO
       NCOUNT = 0
       RHS(:,1) = ZERO
       AMATRX = ZERO
-C	  INITIALIZING STATE DEPENDENT VARIABLES AT T=0
-	  IF (TIME(2).LE.ZERO) THEN
-        SVARS = ZERO
-        DO IT = 1,NINTP
-          SVARS(5*IT-2) = ONE
-        END DO
-	  SVARS(NSVARS) = ONE
+C     INITIALIZING STATE DEPENDENT VARIABLES AT T=0
+      IF (TIME(2).LE.ZERO) THEN
+          SVARS = ZERO
+          DO IT = 1,NINTP
+              SVARS(5*IT-2) = ONE
+          END DO
+          SVARS(NSVARS) = ONE
       END IF
-C	  DETERMINANT OF THE JACOBIAN
-	  CALL SFUNC(CP, N, B1, B2)
-	  T1 = MATMUL(MATMUL(B1,M),X)
-	  T2 = MATMUL(MATMUL(B2,M),X)
-	  CALL CROSS(T1, T2, DA)
-	  DETJ = DSQRT(SUM(DA*DA))
+C     DETERMINANT OF THE JACOBIAN
+      CALL SFUNC(CP, N, B1, B2)
+      T1 = MATMUL(MATMUL(B1,M),X)
+      T2 = MATMUL(MATMUL(B2,M),X)
+      CALL CROSS(T1, T2, DA)
+      DETJ = DSQRT(SUM(DA*DA))
 C     ITERATING THROUGH INTEGRATION POINTS
-	  CALL GINTP(NINTP,W,IP)
-	  DO IT = 1,NINTP
-C	    ROTATION VECTOR
-	    CALL SFUNC(IP(:,IT), N, B1, B2)
-	    T1 = MATMUL(MATMUL(B1,M),X)
-	    T2 = MATMUL(MATMUL(B2,M),X)
-	    CALL ROTVEC(T1,T2,T3,R)
-	    DG = MATMUL(MATMUL(R,N),L)
-	    GIP = MATMUL(DG,U)
-        CALL DRFDF(GIP, B1, B2, T1, T2, T3, M, DR)
-C	    TSL
-        SVARIP = SVARS(5*(IT-1)+1 : 5*IT)
-        CALL TSL(GIP, PROPS, SVARIP, TAU, DTAU)
-	    SVARS(5*(IT-1)+1 : 5*IT) = SVARIP
-C       UPDATING OUTPUT VARIABLES
-        DG = DG + DR
-        RHS(:,1) = RHS(:,1) - W(IT)*MATMUL(TRANSPOSE(DG),TAU)
-	    AMATRX = AMATRX + W(IT)*MATMUL(TRANSPOSE(DG),MATMUL(DTAU,DG))
-	    IF (SVARS(5*IT-2).EQ.ZERO) THEN
-            NCOUNT = NCOUNT+1
-        END IF
-	  END DO
-	  RHS(:,1) = RHS(:,1)*DETJ
-	  AMATRX = AMATRX*DETJ
-      PRINT *, 'TIME(2) = ', TIME(2)
-      PRINT *, 'GIP = ', GIP
+      CALL GINTP(NINTP,W,IP)
+      DO IT = 1,NINTP
+C         ROTATION VECTOR
+          CALL SFUNC(IP(:,IT), N, B1, B2)
+          T1 = MATMUL(MATMUL(B1,M),X)
+          T2 = MATMUL(MATMUL(B2,M),X)
+          CALL ROTVEC(T1,T2,T3,R)
+          DG = MATMUL(MATMUL(R,N),L)
+          GIP = MATMUL(DG,U)
+          CALL DRFDF(GIP, B1, B2, T1, T2, T3, M, DR)
+C         TSL
+          SVARIP = SVARS(5*(IT-1)+1 : 5*IT)
+          CALL TSL(GIP, PROPS, SVARIP, TAU, DTAU)
+          SVARS(5*(IT-1)+1 : 5*IT) = SVARIP
+C         UPDATING OUTPUT VARIABLES
+          DG = DG + DR
+          RHS(:,1) = RHS(:,1) - W(IT)*MATMUL(TRANSPOSE(DG),TAU)
+          AMATRX = AMATRX + W(IT)*MATMUL(TRANSPOSE(DG),MATMUL(DTAU,DG))
+          IF (SVARS(5*IT-2).EQ.ZERO) THEN
+              NCOUNT = NCOUNT+1
+          END IF
+      END DO
+      RHS(:,1) = RHS(:,1)*DETJ
+      AMATRX = AMATRX*DETJ
       IF (NCOUNT.EQ.NINTP) THEN
           SVARS(NSVARS) = ZERO
       END IF
-	  RETURN
-	  END
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     GAUSS POINTS & WEIGHTS
 C-----------------------------------------------------------------------
       SUBROUTINE GINTP(NINTP,WEIGHT,IP)
       INTEGER, INTENT(IN) :: NINTP
-	  DOUBLE PRECISION :: ONE, THREE
+      DOUBLE PRECISION :: ONE, THREE
       DOUBLE PRECISION, INTENT(OUT) :: WEIGHT(NINTP), IP(2,NINTP)
-	  PARAMETER (ONE = 1.D0, THREE = 3.D0)
+      PARAMETER (ONE = 1.D0, THREE = 3.D0)
       IF (NINTP.EQ.4) THEN
-        WEIGHT = ONE
-	    IP = -ONE/SQRT(THREE)
-	    IP(1,2) = -IP(1,2)
-	    IP(:,3) = -IP(:,3)
-	    IP(2,4) = -IP(2,4)
+          WEIGHT = ONE
+          IP = -ONE/SQRT(THREE)
+          IP(1,2) = -IP(1,2)
+          IP(:,3) = -IP(:,3)
+          IP(2,4) = -IP(2,4)
       END IF
       RETURN
       END
@@ -165,27 +165,27 @@ C-----------------------------------------------------------------------
       DOUBLE PRECISION, INTENT(IN) :: IP(2,1)
       DOUBLE PRECISION, INTENT(OUT) :: N(3,12), B1(3,12), B2(3,12)
       PARAMETER (ZERO = 0.D0, ONE=1.D0, QUART = 0.25D0)
-	  N = ZERO
-	  BI1 = ZERO
-	  BI2 = ZERO
+      N = ZERO
+      BI1 = ZERO
+      BI2 = ZERO
       NI(1) = QUART*(ONE-IP(1,1))*(ONE-IP(2,1))
-	  NI(2) = QUART*(ONE+IP(1,1))*(ONE-IP(2,1))
-	  NI(3) = QUART*(ONE+IP(1,1))*(ONE+IP(2,1))
-	  NI(4) = QUART*(ONE-IP(1,1))*(ONE+IP(2,1))
+      NI(2) = QUART*(ONE+IP(1,1))*(ONE-IP(2,1))
+      NI(3) = QUART*(ONE+IP(1,1))*(ONE+IP(2,1))
+      NI(4) = QUART*(ONE-IP(1,1))*(ONE+IP(2,1))
       BI1(1) = -QUART*(ONE-IP(2,1))
-	  BI1(2) = QUART*(ONE-IP(2,1))
-	  BI1(3) = QUART*(ONE+IP(2,1))
-	  BI1(4) = -QUART*(ONE+IP(2,1))
+      BI1(2) = QUART*(ONE-IP(2,1))
+      BI1(3) = QUART*(ONE+IP(2,1))
+      BI1(4) = -QUART*(ONE+IP(2,1))
       BI2(1) = -QUART*(ONE-IP(1,1))
-	  BI2(2) = -QUART*(ONE+IP(1,1))
-	  BI2(3) = QUART*(ONE+IP(1,1))
-	  BI2(4) = QUART*(ONE-IP(1,1))
-	  DO IT = 1,4
-	     DO IT1 = 1,3
-            N(IT1,(IT-1)*3+IT1) = NI(IT)
-	        B1(IT1,(IT-1)*3+IT1) = BI1(IT)
-            B2(IT1,(IT-1)*3+IT1) = BI2(IT)
-	     END DO
+      BI2(2) = -QUART*(ONE+IP(1,1))
+      BI2(3) = QUART*(ONE+IP(1,1))
+      BI2(4) = QUART*(ONE-IP(1,1))
+      DO IT = 1,4
+          DO IT1 = 1,3
+              N(IT1,(IT-1)*3+IT1) = NI(IT)
+              B1(IT1,(IT-1)*3+IT1) = BI1(IT)
+              B2(IT1,(IT-1)*3+IT1) = BI2(IT)
+          END DO
       END DO
       RETURN 
       END
@@ -193,49 +193,49 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     ROTATION VECTOR
 C-----------------------------------------------------------------------
       SUBROUTINE ROTVEC(T1, T2, N, R)
-	  DOUBLE PRECISION E1(3), E2(3), E3(3)
-	  DOUBLE PRECISION, INTENT(IN) :: T1(3,1), T2(3,1)
-	  DOUBLE PRECISION, INTENT(OUT) :: N(3,1), R(3,3)
-	  EXTERNAL MAG, CROSS
-	  CALL MAG(T1, E1)
-	  CALL MAG(T2, E2)
-	  CALL CROSS(E1, E2, N)
-	  CALL MAG(N, E3)
-	  R(1,:) = E1
-	  R(2,:) = E2
-	  R(3,:) = E3
-	  RETURN
-	  END
+      DOUBLE PRECISION E1(3), E2(3), E3(3)
+      DOUBLE PRECISION, INTENT(IN) :: T1(3,1), T2(3,1)
+      DOUBLE PRECISION, INTENT(OUT) :: N(3,1), R(3,3)
+      EXTERNAL MAG, CROSS
+      CALL MAG(T1, E1)
+      CALL MAG(T2, E2)
+      CALL CROSS(E1, E2, N)
+      CALL MAG(N, E3)
+      R(1,:) = E1
+      R(2,:) = E2
+      R(3,:) = E3
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     ROTATION VECTOR DERIVATIVE
 C-----------------------------------------------------------------------
       SUBROUTINE DRFDF(G, B1, B2, T1, T2, T3, M, DR)
-	  DOUBLE PRECISION Z(24,1), DE1(3), DE2(3), DE3(3),  DE(3,3), 
+      DOUBLE PRECISION Z(24,1), DE1(3), DE2(3), DE3(3),  DE(3,3), 
      1 DRI(3,1), DI(3), DT1(3,1), DT2(3,1), DT3(3,1), ZERO, ONE
-	  DOUBLE PRECISION, INTENT(IN) :: G(3,1), B1(3,12), B2(3,12),
+      DOUBLE PRECISION, INTENT(IN) :: G(3,1), B1(3,12), B2(3,12),
      1 M(12,24), T1(3,1), T2(3,1), T3(3,1)
-	  DOUBLE PRECISION, INTENT(OUT) :: DR(3,24)
+      DOUBLE PRECISION, INTENT(OUT) :: DR(3,24)
       INTEGER IT
       PARAMETER (ZERO = 0.D0, ONE=1.D0)
-	  EXTERNAL MAG, DCROSS
+      EXTERNAL MAG, DCROSS
       Z = ZERO
       DO IT=1,24
-        Z(IT,1) = ONE
-        DT1 = MATMUL(MATMUL(B1,M), Z)
-        DT2 = MATMUL(MATMUL(B2,M), Z)
-        CALL DCROSS(T1, T2, DT1, DT2, DT3)
-        CALL DUNIT(T1, DT1, DE1)
-        CALL DUNIT(T2, DT2, DE2)
-        CALL DUNIT(T3, DT3, DE3)
-        DE(:,1) = DE1
-        DE(:,2) = DE2
-        DE(:,3) = DE3
-        DRI = MATMUL(TRANSPOSE(DE), G)
-        DI = RESHAPE(DRI, (/3/))
-        DR(:,IT) = DI
-        Z(IT,1) = ZERO
+          Z(IT,1) = ONE
+          DT1 = MATMUL(MATMUL(B1,M), Z)
+          DT2 = MATMUL(MATMUL(B2,M), Z)
+          CALL DCROSS(T1, T2, DT1, DT2, DT3)
+          CALL DUNIT(T1, DT1, DE1)
+          CALL DUNIT(T2, DT2, DE2)
+          CALL DUNIT(T3, DT3, DE3)
+          DE(:,1) = DE1
+          DE(:,2) = DE2
+          DE(:,3) = DE3
+          DRI = MATMUL(TRANSPOSE(DE), G)
+          DI = RESHAPE(DRI, (/3/))
+          DR(:,IT) = DI
+          Z(IT,1) = ZERO
       END DO
-	  RETURN
+      RETURN
       END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     CROSS PRODUCT
@@ -246,8 +246,8 @@ C-----------------------------------------------------------------------
       C(1) = A(2) * B(3) - A(3) * B(2)
       C(2) = A(3) * B(1) - A(1) * B(3)
       C(3) = A(1) * B(2) - A(2) * B(1)
-	  RETURN
-	  END
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     CROSS PRODUCT DERIVATIVE
 C-----------------------------------------------------------------------
@@ -259,33 +259,33 @@ C-----------------------------------------------------------------------
       CALL CROSS(A,DB,TEMP1)
       CALL CROSS(DA,B,TEMP2)
       DN = TEMP1 + TEMP2
-	  RETURN
-	  END
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     MAGNITUDE
 C-----------------------------------------------------------------------
       SUBROUTINE MAG(V, VUNIT)
-	  DOUBLE PRECISION VMAG
-	  DOUBLE PRECISION, INTENT(IN) :: V(3,1)
-	  DOUBLE PRECISION, INTENT(OUT) :: VUNIT(3,1)
-	  VMAG = DSQRT(SUM(V*V))
-	  VUNIT = V/VMAG
-	  RETURN
-	  END
+      DOUBLE PRECISION VMAG
+      DOUBLE PRECISION, INTENT(IN) :: V(3,1)
+      DOUBLE PRECISION, INTENT(OUT) :: VUNIT(3,1)
+      VMAG = DSQRT(SUM(V*V))
+      VUNIT = V/VMAG
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     UNIT VECTOR DERIVATIVE
 C-----------------------------------------------------------------------
       SUBROUTINE DUNIT(V, DV, DU)
-	  DOUBLE PRECISION VMAG, DVMAG, TEMP(1,1)
-	  DOUBLE PRECISION, INTENT(IN) :: V(3,1), DV(3,1)
-	  DOUBLE PRECISION, INTENT(OUT) :: DU(3,1)
-	  VMAG = DSQRT(SUM(V*V))
+      DOUBLE PRECISION VMAG, DVMAG, TEMP(1,1)
+      DOUBLE PRECISION, INTENT(IN) :: V(3,1), DV(3,1)
+      DOUBLE PRECISION, INTENT(OUT) :: DU(3,1)
+      VMAG = DSQRT(SUM(V*V))
       TEMP = MATMUL(TRANSPOSE(V),DV)/VMAG
-	  DVMAG = TEMP(1,1)
+      DVMAG = TEMP(1,1)
       DU = (VMAG*DV) - (DVMAG*V) 
       DU = DU/(VMAG*VMAG)
-	  RETURN
-	  END
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     BILINEAR TRACTION SEPERATION LAW 
 C-----------------------------------------------------------------------
