@@ -2,8 +2,9 @@
 """
 Created on Thu Sep 30 18:49:57 2021
 
-@author: nandi
+@author: Nanditha Mudunuru
 """
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,41 +25,50 @@ def energyRelease(Du, Dl, G13, GT, b, hu, hl, a):
     P = (2*b*GT/C)**0.5
     return P
 
-# Geometry
-L = 50 # Specimen half length
-B = 25 # Specimen width
-hu = 1.5 # Thickness of top substrate
-hl = 5.1 # Thickness of bottom substrate
-t = 0.2 # Adhesive thickness
-a0 = 60 # Crack length
+def run(input):
+    # Geometry
+    L = input.halfLength # Specimen half length
+    B = input.width # Specimen width
+    hu = input.thicknessUpper # Thickness of top substrate
+    hl = input.thicknessLower # Thickness of bottom substrate
+    t = input.thicknessCZ # Adhesive thickness
+    a0 = input.intialCrack # Crack length
 
-Iu = Inertia(B,hu)
-Il = Inertia(B,hl)
+    Iu = Inertia(B,hu)
+    Il = Inertia(B,hl)
 
-# Substrate properties
-E1 = 109000 
-E2 = 8819
-E3 = 8819
-v12 = 0.34 
-v13 = 0.34 
-v23 = 0.38 
-G12 = 4315
-G13 = 4315
-G23 = 3200
-gT = 0.53
+    # Substrate properties
+    E1 = input.materialProp[0]
+    E2 = input.materialProp[1]
+    E3 = input.materialProp[2]
+    v12 = input.materialProp[3]
+    v13 = input.materialProp[4]
+    v23 = input.materialProp[5]
+    G12 = input.materialProp[6]
+    G13 = input.materialProp[7]
+    G23 = input.materialProp[8]
+    gT = input.fractureToughness
 
-# Analytical Model
-Du = E1*Iu
-Dl = E1*Il
-c0 = compliance(Du, Dl, G13, B, hu, hl, a0)
-## Prefailure
-P_elastic = np.linspace(0, 85, 20, endpoint=True)
-U_elastic = c0*P_elastic
-## Fracture
-a = np.linspace(a0*0.88, a0*2, 20, endpoint=True)
-c = compliance(Du, Dl, G13, B, hu, hl, a)
-P_fracture = energyRelease(Du, Dl, G13, gT, B, hu, hl, a)
-U_fracture = c*P_fracture
-## Ploting
-plt.plot(U_elastic, P_elastic)
-plt.plot(U_fracture, P_fracture)
+    # Analytical Model
+    Du = E1*Iu
+    Dl = E1*Il
+    c0 = compliance(Du, Dl, G13, B, hu, hl, a0)
+    ## Prefailure
+    P_elastic = np.linspace(0, input.maxLoadElastic, 20, endpoint=True)
+    U_elastic = c0*P_elastic
+    ## Fracture
+    a = np.linspace(input.crackLenStart, input.crackLenStop, 20, endpoint=True)
+    c = compliance(Du, Dl, G13, B, hu, hl, a)
+    P_fracture = energyRelease(Du, Dl, G13, gT, B, hu, hl, a)
+    U_fracture = c*P_fracture
+    ## Ploting
+    plt.plot(U_elastic, P_elastic)
+    plt.plot(U_fracture, P_fracture)
+    plt.savefig('Analytical.png')
+    plt.close()
+    Results = pd.DataFrame()
+    Results['U_elastic'] = U_elastic.tolist()
+    Results['P_elastic'] = P_elastic.tolist()
+    Results['U_fracture'] = U_fracture.tolist()
+    Results['P_fracture'] = P_fracture.tolist()
+    Results.to_csv('Analytical.csv', index=False)

@@ -14,3 +14,4 @@ TestDirectory/*/abaqus*
 Source/czmtestkit/__pycache__
 Source/czmtestkit/preprocessors/__pycache__
 Source/czmtestkit/postprocessors/__pycache__
+Source/czmtestkit/analytical/__pycache__
