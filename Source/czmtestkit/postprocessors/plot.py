@@ -10,7 +10,7 @@
 
 
 
-def UvsRFplot(U_factor=1):
+def UvsRFplot(Name, U_factor=1):
     """
     :For use with: CZ environment 
      
@@ -18,12 +18,15 @@ def UvsRFplot(U_factor=1):
 
     :param  U_factor: Multipler for displacement. Useful when post processing standardized tests.
     :type U_factor: float, int
+
+	:param Name: Name to be assigned to the resulting files
+	:type Name: str
     """
     
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    data = pd.read_csv('Results_Raw.csv', header=None)
+    data = pd.read_csv(Name+'_Raw.csv', header=None)
     Data = data.loc[3:]
     Ind = data.loc[0:2].values.tolist()
     Head = [[], [], []]
@@ -48,6 +51,6 @@ def UvsRFplot(U_factor=1):
     ax.set_xlabel('Displacement [mm]')
     ax.set_ylabel('Load [N]')
     ax.grid()
-    plt.savefig('UvsRF.png')
+    plt.savefig(Name+'_UvsRF.png')
     plt.close()
-    Results.to_csv('Results.csv', index=False)
+    Results.to_csv(Name+'.csv', index=False)

@@ -32,7 +32,8 @@ analyticalModel class for analytical results corresponding to the standardized t
 
 ### Docs - a.2.1.0
 
-analyticalModel class
+* analyticalModel class
+* Examples
 
 ### Docs - a.2.0.0
 
@@ -49,7 +50,7 @@ Installation instructions updated to pass windows paths properly to abaqus.
  
 ### Docs - Features under development
 
-*  Pictorial representation of output bodies from part definitions and assembly definitions.
+*  Pictorial representation of output from part definitions and assembly definitions.
 *  Documentation and code citation information.
 *  Interactive options for authors.
 

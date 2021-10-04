@@ -53,11 +53,11 @@ def run(input):
     ## Ploting
     plt.plot(U_elastic, P_elastic)
     plt.plot(U_fracture, P_fracture)
-    plt.savefig('Analytical.png')
+    plt.savefig(input.name+'.png')
     plt.close()
     Results = pd.DataFrame()
     Results['U_elastic'] = U_elastic.tolist()
     Results['P_elastic'] = P_elastic.tolist()
     Results['U_fracture'] = U_fracture.tolist()
     Results['P_fracture'] = P_fracture.tolist()
-    Results.to_csv('Analytical.csv', index=False)
+    Results.to_csv(input.name+'.csv', index=False)
