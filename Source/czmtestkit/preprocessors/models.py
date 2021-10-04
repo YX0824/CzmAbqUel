@@ -195,7 +195,7 @@ class testModel:
 	:param meshSeed: List of mesh seed by side along the 3 directions
 	:type lenTop: List
 
-	:param TabPosition: Location of tab for DCB and ADCB
+	:param TabPosition: Location of tab for DCB and ADCB as a ratio to substrate thickness measured from the adhesive side.
 	:type TabPosition: float <= 1
 	"""
 
@@ -253,7 +253,6 @@ class testModel:
 		gT.matType = self.matTypeTop
 		gT.matProp = self.matPropTop
 		gT.meshSeed = self.meshSeed
-		gT.TabPosition = 0.5
 		
 		## Defining bot substrate
 		gB = geometry()
@@ -262,7 +261,6 @@ class testModel:
 		gB.matType = self.matTypeBot
 		gB.matProp = self.matPropBot
 		gB.meshSeed = self.meshSeed
-		gB.TabPosition = 0.5
 		
 		## Defining cohesive zone
 		gC = geometry()
@@ -273,7 +271,10 @@ class testModel:
 		gC.meshSeed[1] = self.meshSeed[1]
 		gC.meshSeed[2] = self.thickCz
 
-		if self.type == 'ENF':
+		if self.type in ['DCB','ADCB']:
+			gT.TabPosition = self.TabPosition
+			gB.TabPosition = 1 - self.TabPosition
+		elif self.type == 'ENF':
 			gT.loadE1 = self.lenTop*0.5
 			gB.loadE1 = self.loadE1
 			gB.loadE2 = self.loadE2

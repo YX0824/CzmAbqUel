@@ -191,15 +191,12 @@ def WithCrck(p, geom, Name):
     v,e,f,c = p.vertices, p.edges, p.faces, p.cells
     Dp = p.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE, offset=cr).id
     p.PartitionCellByDatumPlane(datumPlane=d[Dp], cells=c.findAt(((l*0.5, b*0.5, h*0.5), )))
-    ## Load edges
-    selectF = e.findAt(((0.0, b*0.5, h),))
-    selectB = e.findAt(((0.0, b*0.5, 0.0),))
-    if geom.TabPosition==0.5:
-        Dp = p.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE, offset=0.5*h).id
+    if geom.TabPosition>0 and geom.TabPosition<1 :
+        Dp = p.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE, offset=geom.TabPosition*h).id
         p.PartitionFaceByDatumPlane(datumPlane=d[Dp], faces=f.findAt(((0, b*0.5, h*0.5), )))
-        ## Load edges
-        selectF = e.findAt(((0.0, b*0.5, h*0.5),))
-        selectB = e.findAt(((0.0, b*0.5, h*0.5),))
+    ## Load edges
+    selectF = e.findAt(((0.0, b*0.5, h*geom.TabPosition),))
+    selectB = e.findAt(((0.0, b*0.5, h*geom.TabPosition),))
 
     MidLen = (l+cr)*0.5
     # Defining useful sets
