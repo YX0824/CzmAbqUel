@@ -70,7 +70,6 @@ class geometry:
 
 		:param Name: Name of the part being generated
 		:type Name: str
-
 		"""
 		# Importing packages functions
 		from rectPart import partGeom
@@ -233,7 +232,6 @@ class testModel:
 
 		:return Job: ASCII data file with keyword and data lines to run the simulation.
 		:type Job: .inp
-
 		"""
 		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
@@ -444,7 +442,6 @@ class testModel:
 
 		:return Job: ASCII data file with keyword and data lines to run the simulation.
 		:type Job: .inp
-
 		"""
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly

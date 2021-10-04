@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 """
-Created on Thu Oct 01 13:22:57 2021
-
-@author: Nanditha Mudunuru
 """
 class analyticalModel:
 	"""
