@@ -7,4 +7,4 @@
 
 """
 from .postprocessors.plot import UvsRFplot
-from .analytical import analyticalModel
+from .analytical.__init__ import analyticalModel

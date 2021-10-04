@@ -70,7 +70,6 @@ class geometry:
 
 		:param Name: Name of the part being generated
 		:type Name: str
-
 		"""
 		# Importing packages functions
 		from rectPart import partGeom
@@ -93,7 +92,7 @@ class geometry:
 			# Anisotropic material defintion
 			elemType = elasAnIso(m, self.matProp, Name)
 			# Orientation assignment
-			p.MaterialOrientation(region=p.set['FullGeom'].cells, 
+			p.MaterialOrientation(region=p.sets['FullGeom'], 
 				orientationType=GLOBAL, axis=AXIS_1, additionalRotationType=ROTATION_NONE, 
 				localCsys=None, fieldName='', stackDirection=STACK_3)
 		elif Type=='AbqMatLib':
@@ -145,58 +144,61 @@ class testModel:
 	:type lenTop: float
 
 	:param lenBot: Length of bottom substrate
-	:type lenTop: float
+	:type lenBot: float
 
 	:param width: Width of the specimen
-	:type lenTop: float
+	:type width: float
 
 	:param thickTop: Thickness of top substrate
-	:type lenTop: float
+	:type thickTop: float
 
 	:param thickBot: Thickness of bottom substrate
-	:type lenTop: float
+	:type thickBot: float
 
 	:param thickCz: Thickness of the cohesive zone
-	:type lenTop: float
+	:type thickCz: float
 
 	:param crack: crack length
-	:type lenTop: float
+	:type crack: float
 
 	:param loadE1: loading edge 1
-	:type lenTop: float
+	:type loadE1: float
 
 	:param loadE2: loading edge 2 
-	:type lenTop: float
+	:type loadE2: float
 
 	:param stepTime: Total step time
-	:type lenTop: float
+	:type stepTime: float
 
 	:param BC: Displacement boundary condition on the load edge/face
-	:type lenTop: List
+	:type BC: List
 
 	:param matTypeTop: String to indicate material type of top substrate
-	:type lenTop: str
+	:type matTypeTop: str
 
 	:param matPropTop: List of material properties of top substrate
-	:type lenTop: List
+	:type matPropTop: List
 
 	:param matTypeBot: String to indicate material type of bottom substrate
-	:type lenTop: str
+	:type matTypeBot: str
 
 	:param matPropBot: List of material properties of bottom substrate
-	:type lenTop: List
+	:type matPropBot: List
 
 	:param matTypeCz: Relative path to the user subroutine or 'AbqMatLib' for implementing energy based linear traction separation law from abaqus material library.
-	:type lenTop: str
+	:type matTypeCz: str
 
 	:param matPropCz: List of material properties of bthe cohesive zone
-	:type lenTop: List
+	:type matPropCz: List
 
 	:param meshSeed: List of mesh seed by side along the 3 directions
-	:type lenTop: List
+	:type meshSeed: List
 
 	:param TabPosition: Location of tab for DCB and ADCB as a ratio to substrate thickness measured from the adhesive side.
 	:type TabPosition: float <= 1
+
+	:param name: Name to be assigned to the resulting files
+	:type name: str
 	"""
 
 	def __init__(self):
@@ -221,6 +223,7 @@ class testModel:
 		self.matPropCz = [1000000,1,1,1,1,1] # List of material properties of bthe cohesive zone
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
 		self.TabPosition = 0.5 # Location of load for DCB and ADCB
+		self.name = 'Job' # Job name
 
 	def generate(self):
 		"""
@@ -229,7 +232,6 @@ class testModel:
 
 		:return Job: ASCII data file with keyword and data lines to run the simulation.
 		:type Job: .inp
-
 		"""
 		
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
@@ -420,7 +422,7 @@ class testModel:
 		m.fieldOutputRequests['F-Output-1'].setValues( frequency=10, variables=('S', 'U', 'RF'))
     
 		# Job 
-		mdb.Job(name='Job', model='Model-1', description='', type=ANALYSIS, 
+		mdb.Job(name=self.name, model='Model-1', description='', type=ANALYSIS, 
 			atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
 			memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, 
 			explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
@@ -429,10 +431,10 @@ class testModel:
 			numDomains=4, numGPUs=0)
 
 		# Writing input file
-		mdb.jobs['Job'].writeInput(consistencyChecking=OFF)
+		mdb.jobs[self.name].writeInput(consistencyChecking=OFF)
 		## Editing .inp to define CZ as user elements
 		if self.matTypeCz!='AbqMatLib':
-			ReDefCE(self.matPropCz, self.matTypeCz)
+			ReDefCE(self.matPropCz, self.matTypeCz, self.name)
 
 	def SinEle(self):
 		"""
@@ -441,7 +443,6 @@ class testModel:
 
 		:return Job: ASCII data file with keyword and data lines to run the simulation.
 		:type Job: .inp
-
 		"""
 		# Importing Abaqus/CAE Release 2018 libraries for preprocessing
 		import assembly
@@ -511,7 +512,7 @@ class testModel:
 		m.fieldOutputRequests['F-Output-1'].setValues( frequency=10, variables=('S', 'U', 'RF'))
     
 		# Job 
-		mdb.Job(name='Job', model='Model-1', description='', type=ANALYSIS, 
+		mdb.Job(name=self.name, model='Model-1', description='', type=ANALYSIS, 
 			atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
 			memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, 
 			explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
@@ -520,7 +521,7 @@ class testModel:
 			numDomains=4, numGPUs=0)
 
 		# Writing input file
-		mdb.jobs['Job'].writeInput(consistencyChecking=OFF)
+		mdb.jobs[self.name].writeInput(consistencyChecking=OFF)
 		## Editing .inp to define CZ as user elements
 		if self.matTypeCz!='AbqMatLib':
-			ReDefCE(self.matPropCz, self.matTypeCz)
+			ReDefCE(self.matPropCz, self.matTypeCz, self.name)

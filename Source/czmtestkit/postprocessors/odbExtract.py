@@ -9,7 +9,7 @@
 
 
 
-def hisOutLoadPoint():
+def hisOutLoadPoint(Name):
     """
     :For use with: Abaqus cae environment
      
@@ -17,6 +17,8 @@ def hisOutLoadPoint():
 
     Requires that history output for reaction force and displacement be requested at a reference point of interest such that this output request is the first one called when defining the model.
 
+	:param Name: odb file name (without extension)
+	:type Name: str
     """
     import csv
     # Abaqus/CAE Release 2018
@@ -25,9 +27,9 @@ def hisOutLoadPoint():
     import odbAccess
 
     Output = []
-    Database = openOdb('Job.odb')
+    Database = openOdb(Name+'.odb')
     Set = Database.steps['Step-1'].historyRegions.keys()
-    with open('Results_Raw.csv', mode='w') as file:
+    with open(Name+'_Raw.csv', mode='w') as file:
         writer = csv.writer(file)
         OutKey = Database.steps['Step-1'].historyRegions[Set[0]].historyOutputs.keys()
         for j in Set:
