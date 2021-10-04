@@ -8,4 +8,4 @@ Using czmtestkit module to process extracted data and generates load displacemnt
 
 import czmtestkit.purPython as ctkPpy
 
-ctkPpy.UvsRFplot()
+ctkPpy.UvsRFplot('DCB_FDF', 2)

@@ -1,5 +1,5 @@
 call conda activate CZ
-for %%S in (DCB_IDF DCB_FDF ADCB_FDF) do (
+for %%S in (DCB_IDF DCB_FDF) do (
 	cd %%S 
 	call abaqus cae noGUI=abqScript.py
 	call python pyScript.py

@@ -13,7 +13,7 @@ from abaqusConstants import *
 
 
 
-def ReDefCE(CzMat, SubRout):
+def ReDefCE(CzMat, SubRout, Name):
     """
     :For use with: Abaqus cae environment     
     
@@ -38,6 +38,9 @@ def ReDefCE(CzMat, SubRout):
     :param SubRout: relative path to the user subroutine
     :type SubRout: str
 
+	:param Name: Name to be assigned to the resulting files
+	:type Name: str
+
     """
     import numpy as np
     import job
@@ -47,7 +50,7 @@ def ReDefCE(CzMat, SubRout):
     MaterialProp = ','.join(CzMat)
 	## Redefining cohesive elements
     # Reading input file
-    file = open('Job.inp')
+    file = open(Name+'.inp')
     Input = file.read()
     file.close()
     # Spliting data lines
@@ -95,14 +98,14 @@ def ReDefCE(CzMat, SubRout):
     Input = Output
     Output = [line for line in Input if '**' not in line]
     Output = '\n'.join(Output)
-    file = open('Job.inp',"w")
+    file = open(Name+'.inp',"w")
     file.write(Output)
     file.close
 
     # Deleting old job defintion
-    del mdb.jobs['Job']
+    del mdb.jobs[Name]
 
     # Creating new defintion using the .inp file
-    mdb.JobFromInputFile(name='Job', inputFileName='Job.inp',
+    mdb.JobFromInputFile(name=Name, inputFileName=Name+'.inp',
         userSubroutine=SubRout, multiprocessingMode=DEFAULT,  
         numCpus=4, numDomains=4, numGPUs=0)

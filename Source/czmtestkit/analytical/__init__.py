@@ -59,6 +59,9 @@ class analyticalModel:
 
 	:param crackLenStop: Crack length for the end of the fracture part of load-displacement curve
 	:type crackLenStop: float
+
+	:param name: Name to be assigned to the resulting files
+	:type name: str
 	"""
 	def __init__(self):
 		# Geometry
@@ -73,6 +76,7 @@ class analyticalModel:
 		self.maxLoadElastic = 100
 		self.crackLenStart = self.intialCrack*0.88
 		self.crackLenStop = self.intialCrack*4
+		self.name = 'Job'
 
 	def DCB(self):
 		"""

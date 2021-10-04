@@ -38,7 +38,7 @@ C-----------------------------------------------------------------------
      3 LFLAGS,MLVARX,DDLMAG,MDLOAD,PNEWDT,JPROPS,NJPROP,PERIOD)
       INCLUDE 'ABA_PARAM.INC'
 C	  From aba_param.inc by default all parameter starting with letters  
-C	  A-H or O-Z are defined as double precision variables. 
+C	  A-H or O-Z are defined as REAL(4) variables. 
 C	  and the reset (I-N) are defined as integers. 
 C     Unless defined otherwise.
       INTEGER, INTENT(IN) :: NDOFEL, NSVARS, NPROPS, NNODE
@@ -54,23 +54,21 @@ C-----------------------------------------------------------------------
 C     FINITE DEFORMATION FORMULATION
 C-----------------------------------------------------------------------
 C     DECLARING INTERNAL VARIABLES
-      DOUBLE PRECISION :: X(24,1), I(3,3), L(12,24), M(12,24), 
-     1 N(3, 12), B1(3, 12), B2(3, 12), T1(3,1), T2(3,1), T3(3,1),    
-     2 R(3,3), W(4), CP(2), IP(2,4), DG(3,24), DR(3,24), GIP(3,1), TAU(3),
-     3 DA(3,1), DETJ, DTAU(3,3), SVARIP(5), ZERO, ONE, HALF, TWO
+      REAL(4) :: UL(NDOFEL,1),PROPSL(NPROPS),COORDSL(MCRD,NNODE),
+     1 X(24,1),I(3,3),L(12,24),M(12,24),N(3,12),B1(3,12),B2(3,12),    
+     2 T1(3,1),T2(3,1),T3(3,1),R(3,3),W(4),CP(2),IP(2,4),DG(3,24), 
+     3 DR(3,24),GIP(3,1),TAU(3),DA(3,1),DETJ,DTAU(3,3),SVARIP(5),
+     4 SVARSL(NSVARS),ZERO,ONE,HALF,TWO
       INTEGER NINTP, IT, IT1, NCOUNT
       EXTERNAL GINTP, ROTVEC, TSL, DRFDF, CROSS
-      PARAMETER (ZERO = 0.D0, ONE = 1.D0, HALF=0.5D0, TWO=2.D0)
+      PARAMETER (ZERO = 0.0, ONE = 1.0, HALF=0.50, TWO=2.0)
 C     INITIALIZING INTERNAL VARIABLES
       NINTP = 4
-      X = RESHAPE(COORDS,(/24,1/))
-      X = X + U
-      PRINT *, 'X = ', X
-C      DO IT = 1,8
-C          DO IT1=1,3
-C              X((IT-1)*3+IT1,1) = X((IT-1)*3+IT1,1)+COORDS(IT1,IT)
-C          END DO
-C      END DO
+      UL = REAL(U,4)
+      COORDSL = REAL(COORDS,4)
+      PROPSL = REAL(PROPS, 4)
+      X = RESHAPE(COORDSL,(/24,1/))
+      X = X + UL
       I = ZERO
       DO IT=1,3
           I(IT,IT)=ONE
@@ -97,18 +95,19 @@ C      END DO
       AMATRX = ZERO
 C     INITIALIZING STATE DEPENDENT VARIABLES AT T=0
       IF (TIME(2).LE.ZERO) THEN
-          SVARS = ZERO
+          SVARS = 0.D0
           DO IT = 1,NINTP
-              SVARS(5*IT-2) = ONE
+              SVARS(5*IT-2) = 1.D0
           END DO
-          SVARS(NSVARS) = ONE
+          SVARS(NSVARS) = 1.D0
       END IF
+      SVARSL = REAL(SVARS,4)
 C     DETERMINANT OF THE JACOBIAN
       CALL SFUNC(CP, N, B1, B2)
       T1 = MATMUL(MATMUL(B1,M),X)
       T2 = MATMUL(MATMUL(B2,M),X)
       CALL CROSS(T1, T2, DA)
-      DETJ = DSQRT(SUM(DA*DA))
+      DETJ = SQRT(SUM(DA*DA))
 C     ITERATING THROUGH INTEGRATION POINTS
       CALL GINTP(NINTP,W,IP)
       DO IT = 1,NINTP
@@ -121,22 +120,26 @@ C         ROTATION VECTOR
           GIP = MATMUL(DG,U)
           CALL DRFDF(GIP, B1, B2, T1, T2, T3, M, DR)
 C         TSL
-          SVARIP = SVARS(5*(IT-1)+1 : 5*IT)
-          CALL TSL(GIP, PROPS, SVARIP, TAU, DTAU)
-          SVARS(5*(IT-1)+1 : 5*IT) = SVARIP
+          SVARIP = SVARSL(5*(IT-1)+1 : 5*IT)
+          CALL TSL(GIP, PROPSL, SVARIP, TAU, DTAU)
+          SVARSL(5*(IT-1)+1 : 5*IT) = SVARIP
 C         UPDATING OUTPUT VARIABLES
           DG = DG + DR
           RHS(:,1) = RHS(:,1) - W(IT)*MATMUL(TRANSPOSE(DG),TAU)
           AMATRX = AMATRX + W(IT)*MATMUL(TRANSPOSE(DG),MATMUL(DTAU,DG))
-          IF (SVARS(5*IT-2).EQ.ZERO) THEN
+          IF (SVARSL(5*IT-2).EQ.ZERO) THEN
               NCOUNT = NCOUNT+1
           END IF
       END DO
       RHS(:,1) = RHS(:,1)*DETJ
       AMATRX = AMATRX*DETJ
       IF (NCOUNT.EQ.NINTP) THEN
-          SVARS(NSVARS) = ZERO
+          SVARSL(NSVARS) = ZERO
       END IF
+      SVARS = DBLE(SVARSL)
+      PRINT *, 'U = ', U
+      PRINT *, 'GIP = ', GIP
+      PRINT *, 'TAU = ', TAU
       RETURN
       END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -144,9 +147,9 @@ C     GAUSS POINTS & WEIGHTS
 C-----------------------------------------------------------------------
       SUBROUTINE GINTP(NINTP,WEIGHT,IP)
       INTEGER, INTENT(IN) :: NINTP
-      DOUBLE PRECISION :: ONE, THREE
-      DOUBLE PRECISION, INTENT(OUT) :: WEIGHT(NINTP), IP(2,NINTP)
-      PARAMETER (ONE = 1.D0, THREE = 3.D0)
+      REAL(4) :: ONE, THREE
+      REAL(4), INTENT(OUT) :: WEIGHT(NINTP), IP(2,NINTP)
+      PARAMETER (ONE = 1.0, THREE = 3.0)
       IF (NINTP.EQ.4) THEN
           WEIGHT = ONE
           IP = -ONE/SQRT(THREE)
@@ -161,10 +164,10 @@ C     SHAPE FUNCTION
 C-----------------------------------------------------------------------
       SUBROUTINE SFUNC(IP, N, B1, B2)
       INTEGER :: IT,IT1
-      DOUBLE PRECISION ZERO, ONE, QUART, NI(4), BI1(4), BI2(4)
-      DOUBLE PRECISION, INTENT(IN) :: IP(2,1)
-      DOUBLE PRECISION, INTENT(OUT) :: N(3,12), B1(3,12), B2(3,12)
-      PARAMETER (ZERO = 0.D0, ONE=1.D0, QUART = 0.25D0)
+      REAL(4) ZERO, ONE, QUART, NI(4), BI1(4), BI2(4)
+      REAL(4), INTENT(IN) :: IP(2,1)
+      REAL(4), INTENT(OUT) :: N(3,12), B1(3,12), B2(3,12)
+      PARAMETER (ZERO = 0.0, ONE=1.0, QUART = 0.250)
       N = ZERO
       BI1 = ZERO
       BI2 = ZERO
@@ -193,9 +196,9 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     ROTATION VECTOR
 C-----------------------------------------------------------------------
       SUBROUTINE ROTVEC(T1, T2, N, R)
-      DOUBLE PRECISION E1(3), E2(3), E3(3)
-      DOUBLE PRECISION, INTENT(IN) :: T1(3,1), T2(3,1)
-      DOUBLE PRECISION, INTENT(OUT) :: N(3,1), R(3,3)
+      REAL(4) E1(3), E2(3), E3(3)
+      REAL(4), INTENT(IN) :: T1(3,1), T2(3,1)
+      REAL(4), INTENT(OUT) :: N(3,1), R(3,3)
       EXTERNAL MAG, CROSS
       CALL MAG(T1, E1)
       CALL MAG(T2, E2)
@@ -210,13 +213,13 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     ROTATION VECTOR DERIVATIVE
 C-----------------------------------------------------------------------
       SUBROUTINE DRFDF(G, B1, B2, T1, T2, T3, M, DR)
-      DOUBLE PRECISION Z(24,1), DE1(3), DE2(3), DE3(3),  DE(3,3), 
+      REAL(4) Z(24,1), DE1(3), DE2(3), DE3(3),  DE(3,3), 
      1 DRI(3,1), DI(3), DT1(3,1), DT2(3,1), DT3(3,1), ZERO, ONE
-      DOUBLE PRECISION, INTENT(IN) :: G(3,1), B1(3,12), B2(3,12),
+      REAL(4), INTENT(IN) :: G(3,1), B1(3,12), B2(3,12),
      1 M(12,24), T1(3,1), T2(3,1), T3(3,1)
-      DOUBLE PRECISION, INTENT(OUT) :: DR(3,24)
+      REAL(4), INTENT(OUT) :: DR(3,24)
       INTEGER IT
-      PARAMETER (ZERO = 0.D0, ONE=1.D0)
+      PARAMETER (ZERO = 0.0, ONE=1.0)
       EXTERNAL MAG, DCROSS
       Z = ZERO
       DO IT=1,24
@@ -241,8 +244,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     CROSS PRODUCT
 C-----------------------------------------------------------------------
       SUBROUTINE CROSS(A, B, C)
-      DOUBLE PRECISION, INTENT(IN) :: A(3), B(3)
-      DOUBLE PRECISION, INTENT(OUT) :: C(3)
+      REAL(4), INTENT(IN) :: A(3), B(3)
+      REAL(4), INTENT(OUT) :: C(3)
       C(1) = A(2) * B(3) - A(3) * B(2)
       C(2) = A(3) * B(1) - A(1) * B(3)
       C(3) = A(1) * B(2) - A(2) * B(1)
@@ -252,9 +255,9 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     CROSS PRODUCT DERIVATIVE
 C-----------------------------------------------------------------------
       SUBROUTINE DCROSS(A, B, DA, DB, DN)
-      DOUBLE PRECISION TEMP1(3,1), TEMP2(3,1)
-      DOUBLE PRECISION, INTENT(IN) :: A(3,1), B(3,1), DA(3,1), DB(3,1)
-      DOUBLE PRECISION, INTENT(OUT) :: DN(3,1)
+      REAL(4) TEMP1(3,1), TEMP2(3,1)
+      REAL(4), INTENT(IN) :: A(3,1), B(3,1), DA(3,1), DB(3,1)
+      REAL(4), INTENT(OUT) :: DN(3,1)
       EXTERNAL CROSS
       CALL CROSS(A,DB,TEMP1)
       CALL CROSS(DA,B,TEMP2)
@@ -265,10 +268,10 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     MAGNITUDE
 C-----------------------------------------------------------------------
       SUBROUTINE MAG(V, VUNIT)
-      DOUBLE PRECISION VMAG
-      DOUBLE PRECISION, INTENT(IN) :: V(3,1)
-      DOUBLE PRECISION, INTENT(OUT) :: VUNIT(3,1)
-      VMAG = DSQRT(SUM(V*V))
+      REAL(4) VMAG
+      REAL(4), INTENT(IN) :: V(3,1)
+      REAL(4), INTENT(OUT) :: VUNIT(3,1)
+      VMAG = SQRT(SUM(V*V))
       VUNIT = V/VMAG
       RETURN
       END
@@ -276,10 +279,10 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     UNIT VECTOR DERIVATIVE
 C-----------------------------------------------------------------------
       SUBROUTINE DUNIT(V, DV, DU)
-      DOUBLE PRECISION VMAG, DVMAG, TEMP(1,1)
-      DOUBLE PRECISION, INTENT(IN) :: V(3,1), DV(3,1)
-      DOUBLE PRECISION, INTENT(OUT) :: DU(3,1)
-      VMAG = DSQRT(SUM(V*V))
+      REAL(4) VMAG, DVMAG, TEMP(1,1)
+      REAL(4), INTENT(IN) :: V(3,1), DV(3,1)
+      REAL(4), INTENT(OUT) :: DU(3,1)
+      VMAG = SQRT(SUM(V*V))
       TEMP = MATMUL(TRANSPOSE(V),DV)/VMAG
       DVMAG = TEMP(1,1)
       DU = (VMAG*DV) - (DVMAG*V) 
@@ -291,17 +294,17 @@ C     BILINEAR TRACTION SEPERATION LAW
 C-----------------------------------------------------------------------
       SUBROUTINE TSL(DEL, PROPS, SVARS, TRACT, DTANG)
       INTEGER :: I,J,NCOUNT
-      DOUBLE PRECISION :: ZERO, HALF, ONE, TWO, TAUN, TAUT,
+      REAL(4) :: ZERO, HALF, ONE, TWO, TAUN, TAUT,
      1 GNC, GTC, ETA, DELNO, DELTO, DELNO2, DELTO2, DELNF, DELTF, DELS,
      2 DELMC, JMPTEN, MRATIO, GRATIO, DELOM, DELFM, H, C, TEMP, 
      3 STIF(3), GM, TAUM
-      DOUBLE PRECISION, INTENT(IN) :: DEL(3), PROPS(*)
-      DOUBLE PRECISION, INTENT(INOUT) :: SVARS(5)
-      DOUBLE PRECISION, INTENT(OUT) :: TRACT(3), DTANG(3,3)
-      PARAMETER (ZERO = 0.D0, HALF = 0.5D0, ONE = 1.D0, TWO = 2.D0)
+      REAL(4), INTENT(IN) :: DEL(3), PROPS(*)
+      REAL(4), INTENT(INOUT) :: SVARS(5)
+      REAL(4), INTENT(OUT) :: TRACT(3), DTANG(3,3)
+      PARAMETER (ZERO = 0.0, HALF = 0.50, ONE = 1.0, TWO = 2.0)
       EXTERNAL MACOP
 C	  PROPERTIES
-      STIF = DBLE(PROPS(1)) !STIFFNESS
+      STIF = PROPS(1) !STIFFNESS
       NCOUNT = 0
 C     ENSURING NON ZERO DISPLACEMENT JUMP
       DO I = 1,3
@@ -318,11 +321,11 @@ C     ENSURING NON ZERO DISPLACEMENT JUMP
           GOTO 99
       END IF
 C     READING REMAINING MATERIAL PROPERTIES
-      TAUN = DBLE(PROPS(2)) !NORMAL STRENGTH
-      TAUT = DBLE(PROPS(3)) !TANGENTIAL STRENGTH
-      GNC = DBLE(PROPS(4)) !FRACTURE TOUGHNESS MODE-1
-      GTC = DBLE(PROPS(5)) !FRACTURE TOUGHNESS MODE-2 & MODE-3
-      ETA = DBLE(PROPS(6)) !B-K PARAMETER
+      TAUN = PROPS(2) !NORMAL STRENGTH
+      TAUT = PROPS(3) !TANGENTIAL STRENGTH
+      GNC = PROPS(4) !FRACTURE TOUGHNESS MODE-1
+      GTC = PROPS(5) !FRACTURE TOUGHNESS MODE-2 & MODE-3
+      ETA = PROPS(6) !B-K PARAMETER
 C	  CUTOFF DISPLACEMENTS
       DELNO = TAUN / STIF(3)
       DELTO = TAUT / STIF(1)
@@ -332,15 +335,15 @@ C	  CUTOFF DISPLACEMENTS
       DELTF = TWO * GTC / TAUT
 C	  DISPLACEMENT JUMP TENSOR
       TEMP = (DEL(1)*DEL(1)) + (DEL(2)*DEL(2))
-      DELS = DSQRT(TEMP)
+      DELS = SQRT(TEMP)
       CALL MACOP(DEL(3), DELMC)
       TEMP = (DELMC*DELMC) + (DELS*DELS)
-      JMPTEN = DSQRT(TEMP)
+      JMPTEN = SQRT(TEMP)
 C	  MIXED MODE PROPERTIES
       MRATIO = DELS / (DELMC + DELS)
       GRATIO = MRATIO*MRATIO/(ONE + (TWO*MRATIO*MRATIO) - (TWO*MRATIO))
       TEMP = DELNO2 + ((GRATIO**ETA) * (DELTO2 - DELNO2))
-      DELOM = DSQRT(TEMP)
+      DELOM = SQRT(TEMP)
       DELFM = ((DELNO*DELNF) 
      1    + ((GRATIO**ETA) * ((DELTO*DELTF) - (DELNO*DELNF))))
      2    / DELOM 
@@ -371,14 +374,14 @@ C	  MATERIAL TANGENT STIFFNESS MATRIX
           DTANG(3,3) = DTANG(3,3) - (STIF(3)*SVARS(1)*DELMC/DEL(3))
       END IF
       IF (JMPTEN.GT.SVARS(2).AND.JMPTEN.LT.DELFM) THEN
-          H = DELFM * DELOM / ((DELFM - DELOM) * (JMPTEN**3.D0))
-		  C = 0.D0
+          H = DELFM * DELOM / ((DELFM - DELOM) * (JMPTEN**3.0))
+		  C = 0.0
           DO I = 1,3
 			DO J = 1,3
 				IF (I.EQ.3.AND.J.EQ.3.AND.DEL(3).NE.ZERO) THEN
 				  C = DELMC/DEL(I)
 				END IF
-				DTANG(I,J) = DTANG(I,J)-STIF(I)*H*((1+C)**2.D0)*DEL(I)*DEL(J)
+				DTANG(I,J) = DTANG(I,J)-STIF(I)*H*((1+C)**2.0)*DEL(I)*DEL(J)
 			END DO
           END DO
       ELSE IF (JMPTEN.GE.DELFM) THEN
@@ -402,12 +405,12 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     MACAULEY OPERATOR
 C-----------------------------------------------------------------------
       SUBROUTINE MACOP(DEL, DELMC)
-      DOUBLE PRECISION :: TEMP1, TEMP2, HALF
-      DOUBLE PRECISION, INTENT(IN) :: DEL
-      DOUBLE PRECISION, INTENT(INOUT) :: DELMC
-      PARAMETER (HALF = 0.5D0)
+      REAL(4) :: TEMP1, TEMP2, HALF
+      REAL(4), INTENT(IN) :: DEL
+      REAL(4), INTENT(INOUT) :: DELMC
+      PARAMETER (HALF = 0.50)
       TEMP1 = DEL*DEL
-      TEMP2 = DSQRT(TEMP1)
+      TEMP2 = SQRT(TEMP1)
       DELMC = HALF*(DEL+TEMP2)     
       RETURN 
       END
