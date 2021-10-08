@@ -46,7 +46,7 @@ def ReDefCE(CzMat, SubRout, Name):
     import job
 
     CzMat = [str(x) for x in CzMat]
-    CzMat = CzMat + ['4'] # Since the only number of integration points available in the user subroutines is 4.
+#    CzMat = CzMat + ['4'] # Since the only number of integration points available in the user subroutines is 4.
     MaterialProp = ','.join(CzMat)
 	## Redefining cohesive elements
     # Reading input file

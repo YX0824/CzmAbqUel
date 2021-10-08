@@ -4,6 +4,10 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
 
 ## Software v1.0.0-a.2.1.0
 
+### a.2.1.1
+
+Different mesh seed for crack
+
 ### a.2.1.0 
 
 analyticalModel class for analytical results corresponding to the standardized tests.
@@ -29,6 +33,10 @@ analyticalModel class for analytical results corresponding to the standardized t
 *  Extend package to include fortran based user element subroutines for the cohesive zone.
 
 ## Documentation v1.0.0-a.2.1.0
+
+### Docs - a.2.1.1
+
+Variables for crack mesh seed
 
 ### Docs - a.2.1.0
 

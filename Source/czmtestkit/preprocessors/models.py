@@ -57,6 +57,7 @@ class geometry:
 		self.matType = None # String to indicate material type 
 		self.matProp = [] # List of material properties
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
+		self.crackMesh = 5 # Mesh seed size for crack
 		self.LoadCase = [0,0,0] # List of boundary conditions to be applied
 		self.TabPosition = 0 # Location of load for DCB and ADCB
 
@@ -112,6 +113,8 @@ class geometry:
 		p.seedEdgeBySize(edges=p.sets['X_Edges'].edges, size=self.meshSeed[0], deviationFactor=0.1, constraint=FINER)
 		p.seedEdgeBySize(edges=p.sets['Y_Edges'].edges, size=self.meshSeed[1], deviationFactor=0.1, constraint=FINER)
 		p.seedEdgeBySize(edges=p.sets['Z_Edges'].edges, size=self.meshSeed[2], deviationFactor=0.1, constraint=FINER)
+		if self.crack != 0:
+			p.seedEdgeBySize(edges=p.sets['Xcrack_Edges'].edges, size=self.crackMesh, deviationFactor=0.1, constraint=FINER)
 		
 		# Generating mesh
 		p.generateMesh()
@@ -194,6 +197,9 @@ class testModel:
 	:param meshSeed: List of mesh seed by side along the 3 directions
 	:type meshSeed: List
 
+	:param crackSeed: Mesh seed by side along the length in the cracked part
+	:type crackSeed: float
+
 	:param TabPosition: Location of tab for DCB and ADCB as a ratio to substrate thickness measured from the adhesive side.
 	:type TabPosition: float <= 1
 
@@ -222,6 +228,7 @@ class testModel:
 		self.matTypeCz = 'AbqMatLib' # String to indicate material type for the cohesive zone ('AbqMatLib' for implementing energy based linear traction separation law from abaqus material library)
 		self.matPropCz = [1000000,1,1,1,1,1] # List of material properties of bthe cohesive zone
 		self.meshSeed = [1,1,1] # List of mesh seed by side along the 3 directions
+		self.crackSeed = 5 # Mesh seed size for crack
 		self.TabPosition = 0.5 # Location of load for DCB and ADCB
 		self.name = 'Job' # Job name
 
@@ -255,6 +262,7 @@ class testModel:
 		gT.matType = self.matTypeTop
 		gT.matProp = self.matPropTop
 		gT.meshSeed = self.meshSeed
+		gT.crackMesh = self.crackSeed
 		
 		## Defining bot substrate
 		gB = geometry()
@@ -263,6 +271,7 @@ class testModel:
 		gB.matType = self.matTypeBot
 		gB.matProp = self.matPropBot
 		gB.meshSeed = self.meshSeed
+		gB.crackMesh = self.crackSeed
 		
 		## Defining cohesive zone
 		gC = geometry()

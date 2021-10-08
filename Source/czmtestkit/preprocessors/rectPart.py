@@ -213,10 +213,11 @@ def WithCrck(p, geom, Name):
     p.Set(cells=c, name='FullGeom')
     ## Mesh seed edges
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
-        ((MidLen, b, 0), ), ((MidLen, b, h), ),
-        ((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
-        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ))
+        ((MidLen, b, 0), ), ((MidLen, b, h), ))
     p.Set(edges=select, name='X_Edges')
+    select = e.findAt(((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
+        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ))
+    p.Set(edges=select, name='Xcrack_Edges')
     select = e.findAt(((0, b*0.5, 0), ), ((0, b*0.5, h), ),
         ((cr, b*0.5, 0), ), ((cr, b*0.5, h), ),
         ((l, b*0.5, 0), ), ((l, b*0.5, h), ))
@@ -282,10 +283,11 @@ def WithCrckP1B(p, geom, Name):
     p.Set(faces=select, name='Back')
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
         ((MidLen, b, 0), ), ((MidLen, b, h), ),
-        ((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
-        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ),
         ((l-(p1*0.5), b, 0), ), ((l-(p1*0.5), 0, 0), ))
     p.Set(edges=select, name='X_Edges')
+    select = e.findAt(((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
+        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ))
+    p.Set(edges=select, name='Xcrack_Edges')
     select = e.findAt(((0, b*0.5, 0), ), ((0, b*0.5, h), ),
         ((cr, b*0.5, 0), ), ((cr, b*0.5, h), ),
         ((l, b*0.5, 0), ), ((l, b*0.5, h), ), ((l-p1, b*0.5, 0), ))
@@ -351,11 +353,15 @@ def WithCrckP1T(p, geom, Name):
     select = f.findAt(((0.0, b*0.5, h*0.5),))
     p.Set(faces=select, name='Back')
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
+        ((MidLen, b, 0), ), ((MidLen, b, h), ))
+    p.Set(edges=select, name='X_Edges')
+    select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
         ((MidLen, b, 0), ), ((MidLen, b, h), ),
-        ((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
-        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ),
         ((l-(p1*0.5), b, h), ), ((l-(p1*0.5), 0, h), ))
     p.Set(edges=select, name='X_Edges')
+    select = e.findAt(((cr*0.5, 0, 0), ), ((cr*0.5, 0, h), ),
+        ((cr*0.5, b, 0), ), ((cr*0.5, b, h), ))
+    p.Set(edges=select, name='Xcrack_Edges')
     select = e.findAt(((0, b*0.5, 0), ), ((0, b*0.5, h), ),
         ((cr, b*0.5, 0), ), ((cr, b*0.5, h), ),
         ((l, b*0.5, 0), ), ((l, b*0.5, h), ), ((LoadLen, b*0.5, h), ))
@@ -431,11 +437,12 @@ def WithCrckP2B(p, geom, Name):
     p.Set(faces=select, name='Back')
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
         ((MidLen, b, 0), ), ((MidLen, b, h), ),
-        (((cr+p2)*0.5, 0, 0), ), (((cr+p2)*0.5, 0, h), ),
-        (((cr+p2)*0.5, b, 0), ), (((cr+p2)*0.5, b, h), ),
-        ((p2*0.5, 0, 0), ), ((p2*0.5, b, 0), ),
         ((l-(p1*0.5), b, 0), ), ((l-(p1*0.5), 0, 0), ))
     p.Set(edges=select, name='X_Edges')
+    select = e.findAt((((cr+p2)*0.5, 0, 0), ), (((cr+p2)*0.5, 0, h), ),
+        (((cr+p2)*0.5, b, 0), ), (((cr+p2)*0.5, b, h), ),
+        ((p2*0.5, 0, 0), ), ((p2*0.5, b, 0), ))
+    p.Set(edges=select, name='Xcrack_Edges')
     select = e.findAt(((0, b*0.5, 0), ), ((0, b*0.5, h), ),
         ((cr, b*0.5, 0), ), ((cr, b*0.5, h), ), ((p2, b*0.5, 0),),
         ((l, b*0.5, 0), ), ((l, b*0.5, h), ), ((LoadLen, b*0.5, 0), ))
@@ -512,11 +519,12 @@ def WithCrckP2T(p, geom, Name):
     p.Set(faces=select, name='Back')
     select = e.findAt(((MidLen, 0, 0), ), ((MidLen, 0, h), ),
         ((MidLen, b, 0), ), ((MidLen, b, h), ),
-        (((cr+p2)*0.5, 0, 0), ), (((cr+p2)*0.5, 0, h), ),
-        (((cr+p2)*0.5, b, 0), ), (((cr+p2)*0.5, b, h), ),
-        ((p2*0.5, 0, 0), ), ((p2*0.5, b, 0), ),
         ((l-(p1*0.5), b, h), ), ((l-(p1*0.5), 0, h), ))
     p.Set(edges=select, name='X_Edges')
+    select = e.findAt((((cr+p2)*0.5, 0, 0), ), (((cr+p2)*0.5, 0, h), ),
+        (((cr+p2)*0.5, b, 0), ), (((cr+p2)*0.5, b, h), ),
+        ((p2*0.5, 0, 0), ), ((p2*0.5, b, 0), ))
+    p.Set(edges=select, name='Xcrack_Edges')
     select = e.findAt(((0, b*0.5, 0), ), ((0, b*0.5, h), ),
         ((cr, b*0.5, 0), ), ((cr, b*0.5, h), ), ((p2, b*0.5, 0),),
         ((l, b*0.5, 0), ), ((l, b*0.5, h), ), ((LoadLen, b*0.5, h), ))
