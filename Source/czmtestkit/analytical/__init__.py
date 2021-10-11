@@ -4,6 +4,9 @@ class analyticalModel:
 	"""
 	Class for generating analytical results for standardized tests.
 
+	:param type: Type of test
+	:type type: str
+
 	:param halfLength: Specimen half length
 	:type halfLength: float
 
@@ -61,6 +64,7 @@ class analyticalModel:
 	"""
 	def __init__(self):
 		# Geometry
+		self.type = 'DCB' # Test type
 		self.halfLength = 100 # Specimen half length
 		self.width = 25 # Specimen width
 		self.thicknessUpper = 2.4 # Thickness of the substrates
@@ -74,40 +78,33 @@ class analyticalModel:
 		self.crackLenStop = self.intialCrack*4
 		self.name = 'Job'
 
-	def DCB(self):
-		"""
-		DCB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
-		"""
-		self.thicknessLower = self.thicknessUpper
-		from .ADCB import run
-		run(self)
-
-	def ADCB(self):
-		"""
-		ADCB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
-		"""
-		from .ADCB import run
-		run(self)
-
-	def SLB(self):
-		"""
-		SLB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
-		"""
-		self.thicknessLower = self.thicknessUpper
-		from .ASLB import run
-		run(self)
-
-	def ASLB(self):
-		"""
-		ASLB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
-		"""
-		from .ASLB import run
-		run(self)
-
-	def ENF(self):
-		"""
-		ENF test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
-		"""
-		self.thicknessLower = self.thicknessUpper
-		from .ENF import run
+	def generate(self):
+		if self.type == 'DCB':
+			"""
+			DCB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
+			"""
+			self.thicknessLower = self.thicknessUpper
+			from .ADCB import run
+		elif self.type == 'ADCB':
+			"""
+			ADCB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
+			"""
+			from .ADCB import run
+		elif self.type == 'SLB':
+			"""
+			SLB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
+			"""
+			self.thicknessLower = self.thicknessUpper
+			from .ASLB import run
+		elif self.type == 'ASLB':
+			"""
+			ASLB test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
+			"""
+			from .ASLB import run
+		elif self.type == 'ENF':
+			"""
+			ENF test for the defined model attributes. Generates a .csv file and plots with load-displacement data.
+			"""
+			self.thicknessLower = self.thicknessUpper
+			from .ENF import run
 		run(self)

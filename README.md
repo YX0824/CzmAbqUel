@@ -4,6 +4,14 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
 
 ## Software v1.0.0-a.2.1.0
 
+### a.2.2.1
+
+Added functionality to purPython module. Functions to:
+
+* Split force displacement data to elastic and fracture regimes.
+* Optimizing emperical model paramters by curve fitting experimental or simulated data.
+* Compare predicted data from emperical models to observed data.
+
 ### a.2.1.1
 
 Different mesh seed for crack
@@ -33,6 +41,10 @@ analyticalModel class for analytical results corresponding to the standardized t
 *  Extend package to include fortran based user element subroutines for the cohesive zone.
 
 ## Documentation v1.0.0-a.2.1.0
+
+### Docs - a.2.2.1
+
+Data comparision functions in purPython module.
 
 ### Docs - a.2.1.1
 
