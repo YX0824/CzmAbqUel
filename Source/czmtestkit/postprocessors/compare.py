@@ -10,6 +10,30 @@ from scipy.optimize import curve_fit
 
 
 
+def mSE(y_exp, y_pred):
+    """
+    compares the error between predicted and observed data.
+    
+    :param y_exp: Expected outcome
+    :type y_exp:array
+    
+    :param y_pred: Predicted outcome
+    :type y_pred:array
+    
+    :return mse: Mean squared error
+    :type mse: float
+    
+    :return mseNorm: Normalized mean squared error
+    :return mseNorm: float
+    """
+    Error = y_pred-y_exp
+    ErrorSquare = Error**2
+    mse = sum(ErrorSquare)/len(ErrorSquare[:,0])
+    mseNorm = mse*len(y_exp)/sum(y_exp)
+    return mse, mseNorm
+
+
+
 def split_max(FileName, DispCol, ForceCol):
     """
     Splits data at maximum force, resulting in split data for elastic regime and fracture regime.
@@ -181,16 +205,19 @@ def fit(dataframe, x_loc, y_loc, func, n, ax):
     :param pOpt: optimized model parameters
     :type pOpt: array
     
-    :param pCov: covariance in model parameters
+    :return pCov: covariance in model parameters
     :type pCov: array
     
-    :return chi2: :math:`\delta^2` test statistic
-    :type chi2: float
+    :return mse: mean squared error
+    :type mse: float
     
-    :param xmin: lower bound for model validity
+    :return mseNorm: mean normalized mean squared error
+    :type mseNorm: float
+    
+    :return xmin: lower bound for model validity
     :type xmin: float
     
-    :param xmax: upper bound for model validity
+    :return xmax: upper bound for model validity
     :type xmax: float
     """
     x = dataframe.iloc[:,x_loc].dropna()
@@ -198,12 +225,12 @@ def fit(dataframe, x_loc, y_loc, func, n, ax):
     p0 = np.ones(n)
     pOpt, pCov = curve_fit(func, x, y, p0=p0)
     y_predicted = func(x, *pOpt)
-    chi2 = np.sum((y_predicted - y)**2 /y)
+    mse, mseNorm = mSE(y, y_predicted)
     xmax = max(x)
     xmin = min(x)
     ax.plot(x,y,label='training')
     ax.plot(x, y_predicted, '--', label='prediction')
-    return pOpt, pCov, chi2, xmin, xmax
+    return pOpt, pCov, xmin, xmax, mse, mseNorm
 
 
 
@@ -246,8 +273,11 @@ def test(dataframe, x_loc, y_loc, x_min, x_max, func, popt, ax):
     :param ax: axes for plotting observed data and the predicted data
     :type ax: matplotlib axes._subplots.AxesSubplot
     
-    :return chi2: :math:`\delta^2` test statistic
-    :type chi2: float
+    :return mse: mean squared error
+    :type mse: float
+    
+    :return mseNorm: mean normalized mean squared error
+    :type mseNorm: float
     """
     data = dataframe.iloc[:,[x_loc,y_loc]].dropna()
     x_header = dataframe.columns[x_loc]
@@ -256,7 +286,7 @@ def test(dataframe, x_loc, y_loc, x_min, x_max, func, popt, ax):
     x = testdata[x_header]
     y = testdata[y_header]
     y_predicted = func(x, *popt)
-    chi2 = np.sum((y_predicted - y)**2 /y)
+    mse, mseNorm = mSE(y, y_predicted)
     dataframe.plot(x_header, y_header, ax=ax)
     ax.plot(x, y_predicted, '--', label='prediction')
-    return chi2
+    return mse, mseNorm

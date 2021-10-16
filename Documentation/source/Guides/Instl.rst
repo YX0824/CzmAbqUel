@@ -62,7 +62,7 @@ Updates
 To update dependencies activate the CZ environment and use the conda environemnt.yml file from CzmAbqUel repository::
 
 	$conda activate CZ
-	$conda evn update -f environment.yml
+	$conda env update -f environment.yml
 
 .. warning::
 	Do not use :code:`--prune` option as this might remove the existing czmtestkit when updating the dependencies.

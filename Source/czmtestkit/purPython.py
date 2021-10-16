@@ -8,4 +8,5 @@
 """
 from .postprocessors.compare import *
 from .postprocessors.plot import UvsRFplot
+from .postprocessors.outputClass import output
 from .analytical.__init__ import analyticalModel
