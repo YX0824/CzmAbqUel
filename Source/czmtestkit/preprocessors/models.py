@@ -401,11 +401,11 @@ class testModel:
 
 		# Step
 		m.StaticStep(name='Step-1', previous='Initial', 
-			timePeriod=self.stepTime, maxNumInc=1000000000, initialInc=self.stepTime*0.001, minInc=1e-15, 
+			timePeriod=self.stepTime, maxNumInc=1000000000, initialInc=self.stepTime*0.001, minInc=1e-25, 
 			maxInc=self.stepTime*0.01, nlgeom=ON)
 		m.steps['Step-1'].control.setValues(allowPropagation=OFF, 
 			resetDefaultValues=OFF, timeIncrementation=(4.0, 8.0, 9.0, 16.0, 10.0, 4.0, 
-			12.0, 15.0, 6.0, 3.0, 50.0))
+			12.0, 25.0, 6.0, 3.0, 50.0))
 
 		# Coupling
 		m.Coupling(name='Constraint-11', controlPoint=a.sets['FixedPoint'], 

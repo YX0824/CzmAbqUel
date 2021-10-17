@@ -64,4 +64,5 @@ html_static_path = ['_static']
 
 # -- Excluding abaqus modules from documentation -------------------------------------------------
 autodoc_mock_imports = ["abaqus", "abaqusConstants","material","section","part","assembly",
-						"step", "interaction","mesh","load","job"]
+						"step", "interaction","mesh","load","job","pamdas","numpy","matplotlib",
+						"scipy"]

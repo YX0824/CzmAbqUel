@@ -16,6 +16,13 @@ Added functionality to purPython module. Functions to:
 * Optimizing emperical model paramters by curve fitting experimental or simulated data.
 * Compare predicted data from emperical models to observed data.
 
+---
+**NOTE**
+
+New library added to the environment. Please update your `CZ` environment.
+
+---
+
 ### a.2.1.1
 
 Different mesh seed for crack
