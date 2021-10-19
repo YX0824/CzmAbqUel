@@ -494,8 +494,8 @@ class testModel:
 		elif self.type == 'NonStdNM':
 			TLoadCase = self.BC
 			BLoadCase = [0 for x in self.BC]
-			a.Set(faces=ic.sets['Bot'].faces+ic.sets['Back'].faces, name='FixedEnd')
-			a.Set(faces=ic.sets['Front'].faces, name='LoadEnd')
+			a.Set(faces=ic.sets['Bot'].faces, edges=ic.sets['Back'].edges, name='FixedEnd')
+			a.Set(edges=ic.sets['Front'].edges, name='LoadEnd')
 
 		# Step
 		m.StaticStep(name='Step-1', previous='Initial', 
