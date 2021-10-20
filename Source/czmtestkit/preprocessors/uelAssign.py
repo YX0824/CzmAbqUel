@@ -46,7 +46,6 @@ def ReDefCE(CzMat, SubRout, Name):
     import job
 
     CzMat = [str(x) for x in CzMat]
-#    CzMat = CzMat + ['4'] # Since the only number of integration points available in the user subroutines is 4.
     MaterialProp = ','.join(CzMat)
 	## Redefining cohesive elements
     # Reading input file
@@ -85,7 +84,7 @@ def ReDefCE(CzMat, SubRout, Name):
         Top = Input[TopStart:CEBstart]
         TopStart = CEBstart+1
         Output.extend(Top)
-        Head = ['*USER ELEMENT, NODES=8, Type= U1, PROPERTIES=6, COORDINATES=3,']
+        Head = ['*USER ELEMENT, NODES=8, Type= U1, PROPERTIES='+str(len(CzMat))+', COORDINATES=3,']
         Head.extend([' VARIABLES=21'])
         Head.extend([' 1, 2, 3'])
         Head.extend(['*UEL PROPERTY, '+CEelset])
