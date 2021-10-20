@@ -13,38 +13,24 @@ from abaqusConstants import *
 
 
 
-def ReDefCE(CzMat, SubRout, Name):
+def ReDefCE(Model):
     """
     :For use with: Abaqus cae environment     
     
     Edits the input file by redefining cohesive zone elements as user defined elements and supresses assigned abaqus section.
+
+    :param Model: testModel instance
+    :type Model: object
     
-    :param CzMat: cohesive zone material properties in the order
-
-        :[0] (float): Stiffness
-
-        :[1] (float): Nominal stress mode-1
-
-        :[2] (float): Nominal stress mode-2
-
-        :[3] (float): Fracture toughness mode-1
-
-        :[4] (float): Fracture toughness mode-2
-
-        :[5] (float): B-K Parameter
-
-    :type CzMat: List
-
-    :param SubRout: relative path to the user subroutine
-    :type SubRout: str
-
-	:param Name: Name to be assigned to the resulting files
-	:type Name: str
-
+	:return Job: ASCII data file with keyword and data lines to run the simulation.
+	:type Job: .inp
     """
     import numpy as np
     import job
 
+    CzMat = Model.matPropCz
+    SubRout = Model.matTypeCz
+    Name = Model.name
     CzMat = [str(x) for x in CzMat]
     MaterialProp = ','.join(CzMat)
 	## Redefining cohesive elements

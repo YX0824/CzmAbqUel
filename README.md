@@ -4,6 +4,10 @@ This repository has python package ``czmtestkit`` developed for generating abaqu
 
 ## Software v1.0.0-a.2.3.1
 
+### a.3.0.0
+
+Model class
+
 ### a.2.3.1
 
 output class in purPython module

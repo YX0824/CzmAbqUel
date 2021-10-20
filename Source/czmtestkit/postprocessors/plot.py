@@ -10,47 +10,80 @@
 
 
 
-def UvsRFplot(Name, U_factor=1):
+def UvsRF(Model):
     """
     :For use with: CZ environment 
      
     Processes raw data extracted from history output. Calculates and plots effective displacement and load data. Also generates a csv file with the results.
 
-    :param  U_factor: Multipler for displacement. Useful when post processing standardized tests.
-    :type U_factor: float, int
+    :param Model: testModel instance
+    :type Model: object
 
-	:param Name: Name to be assigned to the resulting files
-	:type Name: str
+	:return 'Model.name'_UvsRF.png:  matplotlib plot of force vs displacement if Model.UvsRFplot = TRUE
+	:type 'Model.name'_UvsRF.png: image
     """
     
+    import os
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    data = pd.read_csv(Name+'_Raw.csv', header=None)
-    Data = data.loc[3:]
-    Ind = data.loc[0:2].values.tolist()
-    Head = [[], [], []]
-    for i in range(3):
-        Head[i] = list(sorted(set(Ind[i]), key=Ind[i].index))
-    header = pd.MultiIndex.from_product(Head, names=['Node','Output','Direction'])
-    Data.columns = header
-    Data = Data.astype(float)
-    for i in Head[0]:
-        for j in Head[1]:
-            Data[i,j,'Effective'] = (Data.xs(i,level='Node',axis=1).xs(j,level='Output',axis=1)**2).sum(axis=1)**0.5
-        Data[i,'U','Effective'] = U_factor*Data[i,'U','Effective']
-    NodeSet = list(Data.columns.levels[0])
-    Results = Data.xs('Effective',level='Direction',axis=1)   
-    fig, ax = plt.subplots()
-    lw = (len(NodeSet)+1)*2
-    al = 1
-    for i in NodeSet:
-        Results.xs(i,level='Node',axis=1).plot('U', 'RF',ax=ax, linewidth=lw, alpha=al)
-        lw = lw-2
-    ax.legend(NodeSet)
-    ax.set_xlabel('Displacement [mm]')
-    ax.set_ylabel('Load [N]')
-    ax.grid()
-    plt.savefig(Name+'_UvsRF.png')
-    plt.close()
-    Results.to_csv(Name+'.csv', index=False)
+    Name = Model.name
+    U_factor = Model.uFactor
+    plot = Model.UvsRFplot
+
+    
+    if os.path.exists(Name+'_Raw.csv'):
+        data = pd.read_csv(Name+'_Raw.csv', header=None)
+        Data = data.loc[3:]
+        Ind = data.loc[0:2].values.tolist()
+        Head = [[], [], []]
+        for i in range(3):
+            Head[i] = list(sorted(set(Ind[i]), key=Ind[i].index))
+        header = pd.MultiIndex.from_product(Head, names=['Node','Output','Direction'])
+        Data.columns = header
+        Data = Data.astype(float)
+        for i in Head[0]:
+            for j in Head[1]:
+                Data[i,j,'Effective'] = (Data.xs(i,level='Node',axis=1).xs(j,level='Output',axis=1)**2).sum(axis=1)**0.5
+            Data[i,'U','Effective'] = U_factor*Data[i,'U','Effective']
+        NodeSet = list(Data.columns.levels[0])
+        Results = Data.xs('Effective',level='Direction',axis=1)   
+        Results.to_csv(Name+'.csv', index=False)
+        os.remove("demofile.txt")
+        if plot:
+            fig, ax = plt.subplots()
+            lw = (len(NodeSet)+1)*2
+            al = 1
+            for i in NodeSet:
+                Results.xs(i,level='Node',axis=1).plot('U', 'RF',ax=ax, linewidth=lw, alpha=al)
+                lw = lw-2
+            ax.legend(NodeSet)
+            ax.set_xlabel('Displacement [mm]')
+            ax.set_ylabel('Force [N]')
+            ax.grid()
+            plt.savefig(Name+'_UvsRF.png')
+            plt.close()
+    else:
+        print("The file does not exist")
+
+
+
+
+def cleanUp(FolderPath, saveExt=[]):
+    """
+    Directory clean up.
+
+    :param FolderPath: Path to the Directory
+    :type FolderPath: str
+
+    :param saveExt: extensions to ignore (do not include '.') Example: ['odb', 'log', 'inp']
+    :type saveExt: list
+    """
+    Ext = ['txt', 'json', 'png', 'csv'] + saveExt
+    import os 
+    from os import listdir
+    for file_name in listdir(FolderPath):
+        if file_name.split('.')[-1] in Ext:
+            pass
+        else:
+            os.remove(FolderPath + file_name)

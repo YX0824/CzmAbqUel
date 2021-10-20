@@ -9,13 +9,16 @@
 
 
 
-def hisOutLoadPoint(Name):
+def hisOutLoadPoint(Model):
     """
     :For use with: Abaqus cae environment
      
     Extracts history output of the first region (in regions with history outputs) from Job.odb.
 
     Requires that history output for reaction force and displacement be requested at a reference point of interest such that this output request is the first one called when defining the model.
+
+    :param Model: testModel instance
+    :type Model: object
 
 	:param Name: odb file name (without extension)
 	:type Name: str
@@ -26,6 +29,7 @@ def hisOutLoadPoint(Name):
     from odbAccess import openOdb
     import odbAccess
 
+    Name = Model.name
     Output = []
     Database = openOdb(Name+'.odb')
     Set = Database.steps['Step-1'].historyRegions.keys()

@@ -4,6 +4,9 @@ class analyticalModel:
 	"""
 	Class for generating analytical results for standardized tests.
 
+    :param Model: testModel instance
+    :type Model: object
+
 	:param type: Type of test
 	:type type: str
 
@@ -62,21 +65,25 @@ class analyticalModel:
 	:param name: Name to be assigned to the resulting files
 	:type name: str
 	"""
-	def __init__(self):
+	def __init__(self, Model):
+		"""
+		:param Model: testModel instance
+		:type Model: object
+		"""
 		# Geometry
-		self.type = 'DCB' # Test type
-		self.halfLength = 100 # Specimen half length
-		self.width = 25 # Specimen width
-		self.thicknessUpper = 2.4 # Thickness of the substrates
-		self.thicknessLower = 2.4 # Thickness of the substrates
-		self.thicknessCZ = 0.2 # Adhesive thickness
-		self.intialCrack = 60 # Crack length
-		self.materialProp = [109000, 8819, 8819, 0.34, 0.34, 0.38, 4315, 4315, 3200]
-		self.fractureToughness = 4.20
-		self.maxLoadElastic = 100
-		self.crackLenStart = self.intialCrack*0.88
-		self.crackLenStop = self.intialCrack*4
-		self.name = 'Job'
+		self.type = Model.type # Test type
+		self.halfLength = (Model.lenTop - Model.loadE1 - Model.loadE2)*0.5 # Specimen half length
+		self.width = Model.width # Specimen width
+		self.thicknessUpper = Model.thickTop # Thickness of the substrates
+		self.thicknessLower = Model.thickBot # Thickness of the substrates
+		self.thicknessCZ = Model.thickCz # Adhesive thickness
+		self.intialCrack = Model.lenTop -  Model.loadE2 # Crack length
+		self.materialProp = Model.matPropTop # Engineering constants
+		self.fractureToughness = Model.fTough
+		self.maxLoadElastic = Model.peakLoad
+		self.crackLenStart = self.intialCrack - 10
+		self.crackLenStop = self.intialCrack + 40
+		self.name = Model.name + 'Analytical'
 
 	def generate(self):
 		if self.type == 'DCB':
