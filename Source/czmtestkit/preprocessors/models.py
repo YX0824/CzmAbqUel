@@ -222,14 +222,25 @@ def withBulk(Model):
 		memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, 
 		explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
 		modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='', 
-		scratch='', resultsFormat=ODB, multiprocessingMode=DEFAULT, numCpus=4, 
-		numDomains=4, numGPUs=0)
+		scratch='', resultsFormat=ODB, multiprocessingMode=DEFAULT)
 
 	# Writing input file
 	mdb.jobs[Model.name].writeInput(consistencyChecking=OFF)
 	## Editing .inp to define CZ as user elements
 	if Model.matTypeCz!='AbqMatLib':
 		ReDefCE(Model)
+
+	myJob = mdb.jobs[Model.name]
+	myJob.setValues(numCpus=Model.nCpu, numDomains=Model.nCpu, numGPUs=Model.nGpu)
+
+	# Submitting the job
+	myJob.submit()
+
+	# Waiting for completion
+	myJob.waitForCompletion()
+
+
+
 
 def SinEle(Model):
 	"""
@@ -323,3 +334,12 @@ def SinEle(Model):
 	## Editing .inp to define CZ as user elements
 	if Model.matTypeCz!='AbqMatLib':
 		ReDefCE(Model)
+
+	myJob = mdb.jobs[Model.name]
+	myJob.setValues(numCpus=Model.nCpu, numDomains=Model.nCpu, numGPUs=Model.nGpu)
+
+	# Submitting the job
+	myJob.submit()
+
+	# Waiting for completion
+	myJob.waitForCompletion()

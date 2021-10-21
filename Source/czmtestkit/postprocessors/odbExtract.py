@@ -30,6 +30,7 @@ def hisOutLoadPoint(Model):
     import odbAccess
 
     Name = Model.name
+    print(Name)
     Output = []
     Database = openOdb(Name+'.odb')
     Set = Database.steps['Step-1'].historyRegions.keys()

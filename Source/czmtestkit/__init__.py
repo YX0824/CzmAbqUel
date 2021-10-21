@@ -6,7 +6,6 @@ Examples to implement the codes are provided in :ref:`Test Cases` section of the
 Following is the documentation for the scripts.
 
 """
-import .purPython as pPy
 
 class testModel:
 	"""
@@ -109,6 +108,12 @@ class testModel:
 
 	:param fTough: Mixed mode fracture toughness
 	:type fTough: float
+
+	:param nCpu: Number of cpus for abaqus simulations
+	:type nCpu: int
+
+	:param nGpu: Number of cpus for abaqus simulations
+	:type nGpu: int
 	"""
 
 	def __init__(self):
@@ -136,37 +141,30 @@ class testModel:
 		self.TabPosition = 0.5 # Location of load for DCB and ADCB
 		self.name = 'Job' # Job name
 		self.uFactor = 1 # Multiplier for displacement in force displacement curve
-		self.UvsRFplot = TRUE # force displacement plot
+		self.UvsRFplot = True # force displacement plot
 		self.peakLoad = 100 # peak load
 		self.fTough = 1 # Mixed mode fracture toughness
+		self.nCpu = 2 # Number of CPUS
+		self.nGpu = 0 # Number of GPUS
 
-	def addToDatabase(self, path=self.name+'_in.json'):
+	def addToDatabase(self, path=''):
 		"""
 		Adds dictionary of class instance to specified path
 
 		:param path: absolute or relative path
 		:type path: str
 		"""
+		if path == '':
+			path = self.name+'_in.json'
 		import json
 		with open(path, 'a') as file:
 			json.dump(self.__dict__, file)
 			file.write("\n")
 
 
-def pyFun(Model, func):
-	"""
-	Run functions from purPython module.
-
-	:param func: function Name
-	:type func: str
-	"""
-	function = getattr(pPy,func)
-	function(Model)
 
 
-
-
-def abqFun(file, func):
+def abqFun(inpFile, func):
 	"""
 	Run functions from abqPython module.
 
@@ -182,15 +180,19 @@ def abqFun(file, func):
 		file.write("import sys\n")
 		file.write("import json\n")
 		file.write("sys.path.extend("+ str(sys.path) +")\n")
-		file.write("import czmtestkit.abqPyhton as ctkApy\n")
-		file.write("with open("+file+", "r") as file:\n")
+		file.write("import czmtestkit.abqPython as ctkApy\n")
+		line = "file = '" + inpFile + "' \n"
+		file.write(line)
+		file.write("with open(file, 'r') as file:\n")
 		file.write("	input = file.readlines()\n")
-		file.write("input = input[-1].replace('\n','')\n")
-		file.write("if '\r' in input: input = input.replace('\r','')\n")
+		file.write("input = input[-1].strip()\n")
 		file.write("dict = json.loads(input)\n")
 		file.write("Model = ctkApy.testModel()\n")
-		file.write("for key in dict: setattr(Model,key,dict[key])\n")
-		file.write(func+"(Model)\n")
+		file.write("for key in dict: \n")
+		file.write("	if isinstance(dict[key], unicode):\n")
+		file.write("		dict[key] = str(dict[key])\n")
+		file.write("	setattr(Model,key,dict[key])\n")
+		file.write("ctkApy."+func+"(Model)\n")
 	file.close()
 	os.system('abaqus cae noGui=abqScript.py')
 	os.remove('abqScript.py')
@@ -232,15 +234,17 @@ class testOutput:
         self.mseNormExpPred = []
         self.mseNormSimPred = []
         self.mseNormAnaPred = []
-
-	def addToDatabase(self, path=self.name+'_out.json'):
-		"""
-		Adds dictionary of class instance to specified path
-
-		:param path: absolute or relative path
-		:type path: str
-		"""
-		import json
-		with open(path, 'a') as file:
-			json.dump(self.__dict__, file)
-			file.write("\n")
+    
+    def addToDatabase(self,path=''):
+        """
+        Adds dictionary of class instance to specified path
+        
+        :param path: absolute or relative path
+        :type path: str
+        """
+        import json
+        if path == '':
+            path = self.name+'_out.json'
+        with open(path, 'a') as file:
+            json.dump(self.__dict__, file)
+            file.write("\n")

@@ -77,13 +77,13 @@ class analyticalModel:
 		self.thicknessUpper = Model.thickTop # Thickness of the substrates
 		self.thicknessLower = Model.thickBot # Thickness of the substrates
 		self.thicknessCZ = Model.thickCz # Adhesive thickness
-		self.intialCrack = Model.lenTop -  Model.loadE2 # Crack length
+		self.intialCrack = Model.crack -  Model.loadE2 # Crack length
 		self.materialProp = Model.matPropTop # Engineering constants
 		self.fractureToughness = Model.fTough
 		self.maxLoadElastic = Model.peakLoad
 		self.crackLenStart = self.intialCrack - 10
 		self.crackLenStop = self.intialCrack + 40
-		self.name = Model.name + 'Analytical'
+		self.name = Model.name + '_Analytical'
 
 	def generate(self):
 		if self.type == 'DCB':

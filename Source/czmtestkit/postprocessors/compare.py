@@ -28,8 +28,9 @@ def mSE(y_exp, y_pred):
     """
     Error = y_pred-y_exp
     ErrorSquare = Error**2
-    mse = sum(ErrorSquare)/len(ErrorSquare[:,0])
-    mseNorm = mse*len(y_exp)/sum(y_exp)
+    print(type(ErrorSquare))
+    mse = sum(ErrorSquare)/ErrorSquare.shape[0]
+    mseNorm = mse*y_exp.shape[0]/sum(y_exp)
     return mse, mseNorm
 
 
@@ -60,7 +61,7 @@ def split_max(FileName, DispCol, ForceCol):
     :param type: pandas dataframe
 
     """
-    dataFrame = pd.read_csv(FileName+'.csv', delimiter=',')
+    dataFrame = pd.read_csv(FileName+'.csv', delimiter=',', header=1).astype(float)
     Max = dataFrame.idxmax()
     Elastic = dataFrame.iloc[:Max[ForceCol],:]
     Fracture = dataFrame.iloc[Max[ForceCol]:,:]

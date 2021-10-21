@@ -49,7 +49,7 @@ def UvsRF(Model):
         NodeSet = list(Data.columns.levels[0])
         Results = Data.xs('Effective',level='Direction',axis=1)   
         Results.to_csv(Name+'.csv', index=False)
-        os.remove("demofile.txt")
+        os.remove(Name+'_Raw.csv')
         if plot:
             fig, ax = plt.subplots()
             lw = (len(NodeSet)+1)*2
@@ -69,12 +69,9 @@ def UvsRF(Model):
 
 
 
-def cleanUp(FolderPath, saveExt=[]):
+def cleanUp(saveExt=[]):
     """
-    Directory clean up.
-
-    :param FolderPath: Path to the Directory
-    :type FolderPath: str
+    current work directory clean up. txt, json, png, csv files are always excluded during clean up.
 
     :param saveExt: extensions to ignore (do not include '.') Example: ['odb', 'log', 'inp']
     :type saveExt: list
@@ -82,8 +79,8 @@ def cleanUp(FolderPath, saveExt=[]):
     Ext = ['txt', 'json', 'png', 'csv'] + saveExt
     import os 
     from os import listdir
-    for file_name in listdir(FolderPath):
+    for file_name in listdir():
         if file_name.split('.')[-1] in Ext:
             pass
         else:
-            os.remove(FolderPath + file_name)
+            os.remove(file_name)

@@ -75,7 +75,6 @@ class geometry:
 	"""
 	def __init__(self):
 		self.dim = [1,1,0] # dimensions [length, width, thickness]
-        self.type = 'UnPart'
 		self.crack = 0 # crack length 
 		self.loadE1 = 0 # loading edge 1
 		self.loadE2 = 0 # loading edge 2 
@@ -85,15 +84,16 @@ class geometry:
 		self.crackMesh = 5 # Mesh seed size for crack
 		self.LoadCase = [0,0,0] # List of boundary conditions to be applied
 		self.TabPosition = 0 # Location of load for DCB and ADCB
-
+		self.type = 'UnPart'
+	
 	def generate(self, m, Name):
 		"""
 		:For use with: Abaqus cae environment    
 		Generates the part using partGeom function from rectPart module using instance attributes.
-
+		
 		:param m: base abaqus model for the part
 		:type m: object
-
+		
 		:param Name: Name of the part being generated
 		:type Name: str
 		"""
