@@ -1,1 +1,1 @@
-{"name": "1022_001", "mseExpPred": [], "mseSimPred": [51.79481095414572, 11.165372002016461], "mseAnaPred": [1.1483514725927033e-15, 0.3007284791141123], "mseNormExpPred": [], "mseNormSimPred": [1.1570330717443122, 0.15555967185061356], "mseNormAnaPred": [2.2967029451854067e-17, 0.00376818709931871]}
+{"name": "1022_001", "mseExpPred": [], "mseSimPred": 31.48009147808109, "mseAnaPred": 0.15036423955705674, "meanExpPred": [], "meanSimPred": 58.27034350937617, "meanAnaPred": 64.90360234082911, "stdExpPred": [], "stdSimPred": 27.125248084697585, "stdAnaPred": 24.26349282522352}

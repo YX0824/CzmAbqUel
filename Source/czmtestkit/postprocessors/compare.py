@@ -23,15 +23,78 @@ def mSE(y_exp, y_pred):
     :return mse: Mean squared error
     :type mse: float
     
-    :return mseNorm: Normalized mean squared error
-    :return mseNorm: float
+    :return mean: mean of the data
+    :return mean: float
+    
+    :return std: standard deviation in the expected data
+    :return std: float
     """
     Error = y_pred-y_exp
     ErrorSquare = Error**2
-    print(type(ErrorSquare))
-    mse = sum(ErrorSquare)/ErrorSquare.shape[0]
-    mseNorm = mse*y_exp.shape[0]/sum(y_exp)
-    return mse, mseNorm
+    n = ErrorSquare.shape[0]
+    mse = sum(ErrorSquare)/n
+    mean = sum(y_exp)/n
+    std = (sum((y_exp - mean)**2)/n)**0.5
+    return mse, mean, std
+
+
+
+
+def meanComb(m1, m2, n1, n2):
+	"""
+	Determines the mean of two groups given the mean and size of each group.
+
+	:param m1: mean of group 1
+	:type m1: float
+
+	:param m2: mean of group 2
+	:type m2: float
+
+	:param n1: size of group 1
+	:type n1: int
+
+	:param n2: size of group 2
+	:type n2: int
+
+	:retun mc: mean of combined samples
+	:type mc: float
+	"""
+	return (n1*m1 + n2*m2)/(n1+n2)
+
+
+
+
+def sdComb(m1, m2, sd1, sd2, n1, n2):
+	"""
+	Determines the standard deviation of two groups given the mean, standard deviation and size of each group.
+
+	:param m1: mean of group 1
+	:type m1: float
+
+	:param m2: mean of group 2
+	:type m2: float
+	
+	:param sd1: standard deviation of group 1
+	:type sd1: float
+
+	:param sd2: standard deviation of group 2
+	:type sd2: float
+
+	:param n1: size of group 1
+	:type n1: int
+
+	:param n2: size of group 2
+	:type n2: int
+
+	:retun mc: mean of combined samples
+	:type mc: float
+	"""
+	t1 = (n1-1)*(sd1**2)
+	t2 = (n2-1)*(sd2**2)
+	t3 = n1*n2*(m1**2 + m2**2 - 2*m1*m2)/(n1+n2)
+	t4 = n1+n2-1
+	return ((t1+t2+t3)/t4)**0.5
+
 
 
 
@@ -226,12 +289,12 @@ def fit(dataframe, x_loc, y_loc, func, n, ax):
     p0 = np.ones(n)
     pOpt, pCov = curve_fit(func, x, y, p0=p0)
     y_predicted = func(x, *pOpt)
-    mse, mseNorm = mSE(y, y_predicted)
+    mse, mean, std = mSE(y, y_predicted)
     xmax = max(x)
     xmin = min(x)
     ax.plot(x,y,label='training')
     ax.plot(x, y_predicted, '--', label='prediction')
-    return pOpt, pCov, xmin, xmax, mse, mseNorm
+    return pOpt, pCov, xmin, xmax, mse, mean, std
 
 
 
@@ -287,7 +350,7 @@ def test(dataframe, x_loc, y_loc, x_min, x_max, func, popt, ax):
     x = testdata[x_header]
     y = testdata[y_header]
     y_predicted = func(x, *popt)
-    mse, mseNorm = mSE(y, y_predicted)
+    mse, mean, std= mSE(y, y_predicted)
     dataframe.plot(x_header, y_header, ax=ax)
     ax.plot(x, y_predicted, '--', label='prediction')
-    return mse, mseNorm
+    return mse, mean, std

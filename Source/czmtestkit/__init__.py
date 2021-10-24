@@ -176,6 +176,7 @@ def abqFun(inpFile, func):
 	"""
 	import os
 	import sys
+	import subprocess
 	with open('abqScript.py', 'w') as file:
 		file.write("import sys\n")
 		file.write("import json\n")
@@ -194,8 +195,9 @@ def abqFun(inpFile, func):
 		file.write("	setattr(Model,key,dict[key])\n")
 		file.write("ctkApy."+func+"(Model)\n")
 	file.close()
-	os.system('abaqus cae noGui=abqScript.py')
-	os.remove('abqScript.py')
+	runCommand = 'cmd.exe /c abaqus cae noGui=abqScript.py'
+	process = subprocess.Popen(runCommand)
+	process.wait()
 
 
 
@@ -231,9 +233,12 @@ class testOutput:
         self.mseExpPred = []
         self.mseSimPred = []
         self.mseAnaPred = []
-        self.mseNormExpPred = []
-        self.mseNormSimPred = []
-        self.mseNormAnaPred = []
+        self.meanExpPred = []
+        self.meanSimPred = []
+        self.meanAnaPred = []
+        self.stdExpPred = []
+        self.stdSimPred = []
+        self.stdAnaPred = []
     
     def addToDatabase(self,path=''):
         """

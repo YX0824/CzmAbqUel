@@ -8,5 +8,4 @@
 """
 from .postprocessors.compare import *
 from .postprocessors.plot import *
-from .postprocessors.outputClass import output
 from .analytical.__init__ import analyticalModel
