@@ -1,0 +1,276 @@
+*HEADING
+** 2-d MMB 50% test delamination in ABAQUS Std.
+*PREPRINT,ECHO=YES,MODEL=YES,HISTORY=YES,CONTACT=NO
+**
+****************
+** PARAMETERS **
+****************
+*PARAMETER
+** Properties of the specimen interface:
+** Ultimate strenth in tensile mode I (N/mm**2):
+ tauI   =  30.00
+** Ultimate strenth in tensile mode II (N/mm**2):
+ tauII   =  80.00
+** Penalty stiffness paramater (N/mm**3)
+ Kp = 1.0E+5
+** Fracture toughness (N/mm):
+ GIc   = 0.969 
+ GIIc  = 1.719
+** B-K parameter:
+ eta = 2.00
+** Tangent stiffness matrix computed analytically or numerically (Dtan=1)
+ Dtan = 1
+** Properties of the Graphite/Epoxy material (mat1):
+ E11  = 122.7E+03
+ E22  =  10.1E+03
+ E33  =  10.1E+03 
+ nu12 =   0.25
+ nu13 =   0.25
+ nu23 =   0.45
+ G12  =  5.5E+03
+ G13  =  5.5E+03
+ G23  =  3.7E+03
+** GEOMETRY
+** Specimen length (mm):
+ length = 102.0
+** Specimen thickness (mm):
+ thick = 3.12
+** Width in the plane strain direction (mm):
+ width = 25.4
+** Initial crack length (mm):
+ a0 = 32.64
+** Initial constitutive thickness of the cohesive element(mm):
+ thickcoh = 0.
+** Coordinates in the Y direction:
+ t1 = thick/8
+ y1 = 1*t1
+ y2 = 2*t1
+ y3 = 3*t1
+ y4 = 4*t1
+ y5 = y4 + thickcoh
+ y6 = y5 + t1
+ y7 = y6 + t1
+ y8 = y7 + t1
+ y9 = y8 + t1
+**
+*************************
+** GENERATION OF NODES **
+*************************
+*NODE
+  10001,       0.,   0.
+  11001, <length>,   0.
+  20001,       0., <y1>
+  21001, <length>, <y1>
+  30001,       0., <y2>
+  31001, <length>, <y2>
+  40001,       0., <y3>
+  41001, <length>, <y3>
+  50001,       0., <y4>
+  51001, <length>, <y4>
+  60001,       0., <y5>
+  61001, <length>, <y5>
+  70001,       0., <y6>
+  71001, <length>, <y6>
+  80001,       0., <y7>
+  81001, <length>, <y7>
+  90001,       0., <y8>
+  91001, <length>, <y8>
+ 100001,       0., <y9>
+ 101001, <length>, <y9>
+**
+*NGEN, NSET=nfront
+  10001,  11001, 1
+  20001,  21001, 1
+  30001,  31001, 1
+  40001,  41001, 1
+  50001,  51001, 1
+  60001,  61001, 1
+  70001,  71001, 1
+  80001,  81001, 1
+  90001,  91001, 1
+ 100001, 101001, 1
+**
+**Lever node
+*NODE, NSET=lever
+ 9999999,8.0733,30,0
+**
+*************************
+** GENERATION OF NSETS **
+*************************
+*NSET, NSET=nall
+ nfront,
+*NSET, NSET=top
+ 101001,
+*NSET, NSET=top-mid
+ 100501,
+*NSET, NSET=base1
+ 10001,
+*NSET, NSET=base2
+ 11001,
+*NSET,NSET=bondnodes,GENERATE
+ 50001,50681,1
+*NSET, NSET=postnodes
+ base1,base2,top,top-mid,lever
+**
+*************************************
+** ELEMENTS AND MATERIAL PROPERTIES**
+*************************************
+*ELEMENT, TYPE=CPE4I
+ 10001, 10001,10002, 20002,20001
+ 40001, 40001,40002, 50002,50001
+ 60001, 60001,60002, 70002,70001
+ 70001, 70001,70002, 80002,80001
+*ELGEN, ELSET=bottom
+ 10001, 1000, 1, 1, 3, 10000, 10000
+*ELGEN, ELSET=bottom_mid
+ 40001, 1000, 1, 1
+*ELGEN, ELSET=top_mid
+ 60001, 1000, 1, 1
+*ELGEN, ELSET=top
+ 70001, 1000, 1, 1, 3, 10000, 10000
+*ELSET, ELSET=all_solid
+ bottom, bottom_mid, top_mid, top
+*ELSET, ELSET=bot_conta, GENERATE
+ 40001, 40680,1
+*ELSET, ELSET=top_conta, GENERATE
+ 60001, 60680,1 
+*SURFACE, NAME=bot_surf, TYPE=ELEMENT
+ bot_conta, s3
+*SURFACE, NAME=top_surf, TYPE=ELEMENT 
+ top_conta, s1
+*ORIENTATION, NAME=global, DEFINITION=COORDINATES
+ 1.,0.,0., 0.,1.,0.
+ 2,0.
+*SOLID SECTION, ELSET=all_solid, MATERIAL=mat1, ORIENTATION=global
+ <width>,
+*MATERIAL, NAME=mat1
+*ELASTIC, TYPE=ENGINEERING CONSTANTS
+ <E11>, <E22>, <E33>, <nu12>, <nu13>, <nu23>, <G12>, <G13>,
+ <G23>
+***************************************************
+** UEL SUBROUTINE
+***************************************************
+*USER ELEMENT, TYPE=U1, NODES=4, UNSYMM, COORDINATES=2,
+ PROPERTIES=7, I PROPERTIES=2, VARIABLES=2
+ 1,2
+*ELEMENT, TYPE=U1
+ 50001, 50001,50002, 60001,60002
+*ELGEN, ELSET=inter
+ 50001,  680, 1, 1
+*UEL PROPERTY, ELSET=inter
+ <GIc>, <GIIc>, <tauI>,<tauII>, <Kp>, <eta>, <width>, 
+ 1, <Dtan>
+***************************************************
+** UMAT SUBROUTINE
+***************************************************
+**ELEMENT, TYPE=COH2D4
+** 50001, 50001,50002, 60002,60001
+**ELGEN, ELSET=inter
+** 50001,  680, 1, 1
+**COHESIVE SECTION,ELSET=inter,RESPONSE=TRACTION SEPARATION,MATERIAL=coh,THICKNESS=SPECIFIED
+** 1.0, <width>
+**MATERIAL,NAME=coh
+**USER MATERIAL, TYPE=MECHANICAL, UNSYMM, CONSTANTS=6
+** <GIc>, <GIIc>, <tauI>, <Kp>, <eta>, <Dtan>
+**DEPVAR
+** 2 
+**INITIAL CONDITIONS,TYPE=SOLUTION
+** inter, 0., 0.
+***************************************************
+** UINTER SUBROUTINE
+***************************************************
+**CONTACT PAIR,INTERACTION=inter,ADJUST=bondnodes
+** bot_surf, top_surf
+**SURFACE INTERACTION, NAME=inter, DEPVAR=2, PROPERTIES=6, UNSYMM, USER
+** <width>,
+** <GIc>, <GIIc>, <tauI>, <Kp>, <eta>, <Dtan>
+***************************************************
+***************************************************
+*************************
+** BOUNDARY CONDITIONS **
+*************************
+*BOUNDARY
+ base1,2,2
+ base2,1,2
+**
+*EQUATION
+ 3
+ top,2,2.008,top-mid,2,-3.008,lever,2,1
+** 
+*************
+** STEP 1  **
+*************
+*STEP,INC=10000,NLGEOM=NO
+ 7mm displacement
+*STATIC
+ 0.025,1.0,,0.025
+*BOUNDARY,TYPE=DISP
+ lever,2,2,-7.0
+**
+*CONTROLS,PARAMETERS=FIELD,FIELD=DISPLACEMENT
+ 0.05,1.0
+*CONTROLS,PARAMETERS=TIME INCREMENTATION
+ 1500,1500,,1500,1500
+*CONTROLS,PARAMETERS=LINE SEARCH
+ 4,4,0.25,0.25,0.15
+**
+*MONITOR,NODE=lever,DOF=2
+**
+** OUTPUT REQUESTS
+**
+*RESTART,WRITE,FREQUENCY=0
+*OUTPUT,FIELD
+*NODE OUTPUT
+ U,RF
+*ELEMENT OUTPUT
+ E,S
+**CONTACT OUTPUT
+** SDV1,SDV2
+**ELEMENT OUTPUT,ELSET=inter
+** SDV1,SDV2
+**
+*OUTPUT, HISTORY, FREQUENCY=1
+*NODE OUTPUT, NSET=lever
+ U2,RF2
+*END STEP
+**
+*************
+** STEP 2  **
+*************
+*STEP,INC=10000,NLGEOM=NO
+ 14mm displacement
+*STATIC
+ 0.005,1.0,1e-12,0.005
+*BOUNDARY,TYPE=DISP
+ lever,2,2,-14.0
+**
+*CONTROLS,PARAMETERS=FIELD,FIELD=DISPLACEMENT
+ 0.05,1.0
+*CONTROLS,PARAMETERS=TIME INCREMENTATION
+ 1500,1500,,1500,1500
+*CONTROLS,PARAMETERS=LINE SEARCH
+ 4,4,0.25,0.25,0.15
+**
+*MONITOR,NODE=lever,DOF=2
+**
+** OUTPUT REQUESTS
+**
+*RESTART,WRITE,FREQUENCY=0
+*OUTPUT,FIELD
+*NODE OUTPUT
+ U,RF
+*ELEMENT OUTPUT
+ E,S
+**CONTACT OUTPUT
+** SDV1,SDV2
+**ELEMENT OUTPUT,ELSET=inter
+** SDV1,SDV2
+**
+*OUTPUT, HISTORY, FREQUENCY=1
+*NODE OUTPUT, NSET=lever
+ U2,RF2
+*END STEP
+**
+*********
+** END **
+*********

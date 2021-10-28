@@ -133,6 +133,7 @@ C           UPDATING OUTPUT VARIABLES
                   NCOUNT = NCOUNT+1
             END IF
       END DO
+      PRINT *, 'RHS = ', RHS(:,1)
       IF (NCOUNT.EQ.NINTP) THEN
             SVARS(NSVARS) = ZERO
       END IF
@@ -366,7 +367,7 @@ C     MATERIAL TANGENT STIFFNESS MATRIX
       IF (DEL(3).NE.ZERO) THEN
             DTANG(3,3) = DTANG(3,3) - (STIF(3)*SVARS(1)*DELMC/DEL(3))
       END IF
-      IF (JMPTEN.GT.SVARS(2).AND.JMPTEN.LT.DELFM) THEN
+      IF (JMPTEN.GE.SVARS(2).AND.JMPTEN.LT.DELFM) THEN
             H = DELFM * DELOM / ((DELFM - DELOM) * (JMPTEN**3.D0))
             C = 0.D0
             DO I = 1,3

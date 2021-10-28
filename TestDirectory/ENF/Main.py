@@ -7,22 +7,22 @@ import czmtestkit.purPython as pPy
 
 def RUN(Name, Interface):
 	t = ctk.testModel()
-	t.type = 'DCB' # Model type
-	t.lenTop = 100 # Length of top substrate
-	t.lenBot = 100 # Length of bottom substrate
+	t.type = 'ENF' # Model type
+	t.lenTop = 200 # Length of top substrate
+	t.lenBot = 200 # Length of bottom substrate
 	t.width = 25 # Width of the Model
 	t.thickTop = 2.4 # Thickness of top substrate
 	t.thickBot = 2.4 # Thickness of bottom substrate
 	t.thickCz = 0.2 # Thickness of the cohesive zone
-	t.crack = 60 # crack length 
+	t.crack = 70 # crack length 
 	t.loadE1 = 0 # loading edge 1
 	t.loadE2 = 0 # loading edge 2 
 	t.stepTime = 1 # Total step time
-	t.uFactor = 2 # Multiplier for displacement in force displacement curve
+	t.uFactor = 1 # Multiplier for displacement in force displacement curve
 	t.UvsRFplot = True # force displacement plot
-	t.peakLoad = 100 # peak load
-	t.fTough = 0.42 # Mixed mode fracture toughness
-	t.BC = [0,0,5] # Displacement boundary condition on the load edge/face
+	t.peakLoad = 5500 # peak load
+	t.fTough = 2.89 # Mixed mode fracture toughness
+	t.BC = [0,0,8] # Displacement boundary condition on the load edge/face
 	t.matPropCz = [1000000, 18, 18*((2.89/0.42)**0.5), 0.42, 2.89, 2.35] # List of material properties of the cohesive zone
 	t.matTypeTop = "AnIso"
 	t.matPropTop = [109000, 8819, 8819, 0.34, 0.34, 0.38, 4315, 4315, 3200] # Anisotropic elastic material properties

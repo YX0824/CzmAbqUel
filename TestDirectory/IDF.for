@@ -72,15 +72,15 @@ C     INITIALIZING INTERNAL VARIABLES
       DO IT=1,3
           I(IT,IT)=ONE
       END DO
-	L(1:12,1:24) = ZERO
-	M(1:12,1:24) = ZERO
-	DO IT=1,12
+      L(1:12,1:24) = ZERO
+      M(1:12,1:24) = ZERO
+      DO IT=1,12
 	    L(IT,IT) = -ONE
 	    L(IT,IT+12) = ONE
 	    M(IT,IT) = HALF
 	    M(IT,IT+12) = HALF
-	END DO
-	DA(1:3) = ZERO
+      END DO
+      DA(1:3) = ZERO
       W(1:4) = ZERO
       CP(1:2) = ZERO
       IP(1:2,1:4) = ZERO
@@ -91,59 +91,60 @@ C     INITIALIZING INTERNAL VARIABLES
       NCOUNT = 0
       RHS(1:MLVARX,1) = ZERO
       AMATRX(1:NDOFEL,1:NDOFEL) = ZERO
-C	INITIALIZING STATE DEPENDENT VARIABLES AT T=0
-	IF (TIME(2).LE.ZERO) THEN
+C	  INITIALIZING STATE DEPENDENT VARIABLES AT T=0
+      IF (TIME(2).LE.ZERO) THEN
         SVARS(1:NSVARS) = ZERO
         DO IT = 1,NINTP
           SVARS(5*IT-2) = ONE
         END DO
 	  SVARS(NSVARS) = ONE
       END IF
-C	ROTATION VECTOR
-	CALL SFUNC(CP, N, B1, B2)
-	T1(1:3) = MATMUL(MATMUL(B1,M),X)
-	T2(1:3) = MATMUL(MATMUL(B2,M),X)
-	CALL CROSS(T1, T2, DA)
-	DETJ = DSQRT(SUM(DA*DA))
-	CALL ROTVEC(T1,T2,R)
+C	  ROTATION VECTOR
+      CALL SFUNC(CP, N, B1, B2)
+      T1(1:3) = MATMUL(MATMUL(B1,M),X)
+      T2(1:3) = MATMUL(MATMUL(B2,M),X)
+      CALL CROSS(T1, T2, DA)
+      DETJ = DSQRT(SUM(DA*DA))
+      CALL ROTVEC(T1,T2,R)
 C     ITERATING THROUGH INTEGRATION POINTS
-	CALL GINTP(NINTP,W,IP)
-	DO IT = 1,NINTP
+      CALL GINTP(NINTP,W,IP)
+      DO IT = 1,NINTP
 	    CALL SFUNC(IP(:,IT), N, B1, B2)
 	    DG(1:3,1:24) = MATMUL(MATMUL(R,N),L)
 	    GIP(1:3) = MATMUL(DG,U)
 C	    TSL
           SVARIP(1:5) = SVARS(((5*(IT-1))+1) : (5*IT))
           CALL TSL(GIP, PROPS, SVARIP, TAU, DTAU)
-	    SVARS(((5*(IT-1))+1) : (5*IT)) = SVARIP(1:5)
+	      SVARS(((5*(IT-1))+1) : (5*IT)) = SVARIP(1:5)
 C         UPDATING OUTPUT VARIABLES
           RHS(1:24,1) = RHS(1:24,1) 
      1      - (W(IT)*DETJ*MATMUL(TRANSPOSE(DG),TAU))
-	    AMATRX(1:24,1:24) = AMATRX(1:24,1:24)
+	      AMATRX(1:24,1:24) = AMATRX(1:24,1:24)
      1      + (W(IT)*DETJ*MATMUL(TRANSPOSE(DG),MATMUL(DTAU,DG)))
-	    IF (SVARS((5*IT)-2).EQ.ZERO) THEN
+	      IF (SVARS((5*IT)-2).EQ.ZERO) THEN
             NCOUNT = NCOUNT+1
           END IF
-	END DO
+      END DO
+      PRINT *, 'RHS = ', RHS(:,1)
       IF (NCOUNT.EQ.NINTP) THEN
           SVARS(NSVARS) = ZERO
       END IF
-	RETURN
-	END
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     GAUSS POINTS & WEIGHTS
 C-----------------------------------------------------------------------
       SUBROUTINE GINTP(NINTP,WEIGHT,IP)
       INTEGER, INTENT(IN) :: NINTP
-	DOUBLE PRECISION :: ONE, THREE
+      DOUBLE PRECISION :: ONE, THREE
       DOUBLE PRECISION, INTENT(OUT) :: WEIGHT(NINTP), IP(2,NINTP)
-	PARAMETER (ONE = 1.D0, THREE = 3.D0)
+      PARAMETER (ONE = 1.D0, THREE = 3.D0)
       IF (NINTP.EQ.4) THEN
           WEIGHT(:) = ONE
-	    IP(:,:) = -ONE/DSQRT(THREE)
-	    IP(1,2) = -IP(1,2)
-	    IP(:,3) = -IP(:,3)
-	    IP(2,4) = -IP(2,4)
+	      IP(:,:) = -ONE/DSQRT(THREE)
+	      IP(1,2) = -IP(1,2)
+	      IP(:,3) = -IP(:,3)
+	      IP(2,4) = -IP(2,4)
       END IF
       RETURN
       END
@@ -157,18 +158,18 @@ C-----------------------------------------------------------------------
       DOUBLE PRECISION, INTENT(OUT) :: N(3,12), B1(3,12), B2(3,12)
       PARAMETER (ZERO = 0.D0, ONE=1.D0, QUART = 0.25D0)
       NI(1) = QUART*(ONE-IP(1))*(ONE-IP(2))
-	NI(2) = QUART*(ONE+IP(1))*(ONE-IP(2))
-	NI(3) = QUART*(ONE+IP(1))*(ONE+IP(2))
-	NI(4) = QUART*(ONE-IP(1))*(ONE+IP(2))
+      NI(2) = QUART*(ONE+IP(1))*(ONE-IP(2))
+      NI(3) = QUART*(ONE+IP(1))*(ONE+IP(2))
+      NI(4) = QUART*(ONE-IP(1))*(ONE+IP(2))
       BI1(1) = -QUART*(ONE-IP(2))
-	BI1(2) = QUART*(ONE-IP(2))
-	BI1(3) = QUART*(ONE+IP(2))
-	BI1(4) = -QUART*(ONE+IP(2))
+      BI1(2) = QUART*(ONE-IP(2))
+      BI1(3) = QUART*(ONE+IP(2))
+      BI1(4) = -QUART*(ONE+IP(2))
       BI2(1) = -QUART*(ONE-IP(1))
-	BI2(2) = -QUART*(ONE+IP(1))
-	BI2(3) = QUART*(ONE+IP(1))
-	BI2(4) = QUART*(ONE-IP(1))
-	DO IT = 1,4
+      BI2(2) = -QUART*(ONE+IP(1))
+      BI2(3) = QUART*(ONE+IP(1))
+      BI2(4) = QUART*(ONE-IP(1))
+      DO IT = 1,4
 	     DO IT1 = 1,3
                 N(IT1,((IT-1)*3+IT1)) = NI(IT)
 	          B1(IT1,((IT-1)*3+IT1)) = BI1(IT)
@@ -181,19 +182,19 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     ROTATION VECTOR
 C-----------------------------------------------------------------------
       SUBROUTINE ROTVEC(T1, T2, R)
-	DOUBLE PRECISION N(3), E1(3), E2(3), E3(3)
-	DOUBLE PRECISION, INTENT(IN) :: T1(3), T2(3)
-	DOUBLE PRECISION, INTENT(OUT) :: R(3,3)
-	EXTERNAL MAG, CROSS
-	CALL MAG(T1, E1)
-	CALL MAG(T2, E2)
-	CALL CROSS(E1, E2, N)
-	CALL MAG(N, E3)
-	R(1,:) = E1
-	R(2,:) = E2
-	R(3,:) = E3
-	RETURN
-	END
+      DOUBLE PRECISION N(3), E1(3), E2(3), E3(3)
+      DOUBLE PRECISION, INTENT(IN) :: T1(3), T2(3)
+      DOUBLE PRECISION, INTENT(OUT) :: R(3,3)
+      EXTERNAL MAG, CROSS
+      CALL MAG(T1, E1)
+      CALL MAG(T2, E2)
+      CALL CROSS(E1, E2, N)
+      CALL MAG(N, E3)
+      R(1,:) = E1
+      R(2,:) = E2
+      R(3,:) = E3
+      RETURN
+      END
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C     CROSS PRODUCT
 C-----------------------------------------------------------------------
@@ -273,8 +274,8 @@ C	  MIXED MODE PROPERTIES
       DELOM = DSQRT(TEMP)
       DELFM = (DELNO*DELNF/ DELOM ) 
      1    + ((GRATIO**ETA) * ((DELTO*DELTF) - (DELNO*DELNF))/ DELOM )
-C	STATE VARIABLES: DAMAGE
-	IF (SVARS(2).LE.JMPTEN) THEN
+C	  STATE VARIABLES: DAMAGE
+      IF (SVARS(2).LE.JMPTEN) THEN
           SVARS(2) = JMPTEN
       END IF
       IF (SVARS(2).GE.DELOM) THEN
@@ -285,21 +286,21 @@ C	STATE VARIABLES: DAMAGE
               SVARS(3) = ZERO
           END IF
       END IF 
-C	TRACTION VECTOR
+C	  TRACTION VECTOR
       CALL MACOP(-DEL(3), DELMC)
       DO I = 1,3
           TRACT(I) = (ONE-SVARS(1))*STIF(I)*DEL(I)
       END DO
       TRACT(3) = TRACT(3) - (SVARS(1)*STIF(3)*DELMC)
-C	MATERIAL TANGENT STIFFNESS MATRIX
+C	  MATERIAL TANGENT STIFFNESS MATRIX
       DTANG = ZERO
-	DO I = 1,3
+      DO I = 1,3
           DTANG(I,I) = STIF(I)*(ONE-SVARS(1))
       END DO
       IF (DEL(3).NE.ZERO) THEN
           DTANG(3,3) = DTANG(3,3) - (STIF(3)*SVARS(1)*DELMC/DEL(3))
       END IF
-      IF (JMPTEN.GT.SVARS(2).AND.JMPTEN.LT.DELFM) THEN
+      IF (JMPTEN.GE.SVARS(2).AND.JMPTEN.LT.DELFM) THEN
           H = DELFM * DELOM / ((DELFM - DELOM) * (JMPTEN**3.D0))
 	    C = 0.D0
           DO I = 1,3
@@ -317,9 +318,9 @@ C	MATERIAL TANGENT STIFFNESS MATRIX
 			DTANG(3,3) = -STIF(3)*DELMC/DEL(3)
 		  END IF
       END IF
-	IF (SVARS(1).EQ.ZERO) THEN
+      IF (SVARS(1).EQ.ZERO) THEN
 	      SVARS(3) = ONE
-	END IF
+      END IF
 C     STATE VARIABLES: OUTPUT
       SVARS(4) = GRATIO
       TAUM = (TAUN**2) + (((TAUT**2)-(TAUN**2))*(GRATIO**ETA))

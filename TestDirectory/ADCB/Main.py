@@ -7,21 +7,21 @@ import czmtestkit.purPython as pPy
 
 def RUN(Name, Interface):
 	t = ctk.testModel()
-	t.type = 'DCB' # Model type
+	t.type = 'ADCB' # Model type
 	t.lenTop = 100 # Length of top substrate
 	t.lenBot = 100 # Length of bottom substrate
 	t.width = 25 # Width of the Model
-	t.thickTop = 2.4 # Thickness of top substrate
-	t.thickBot = 2.4 # Thickness of bottom substrate
+	t.thickTop = 1.5 # Thickness of top substrate
+	t.thickBot = 5.1 # Thickness of bottom substrate
 	t.thickCz = 0.2 # Thickness of the cohesive zone
-	t.crack = 60 # crack length 
+	t.crack = 30 # crack length 
 	t.loadE1 = 0 # loading edge 1
 	t.loadE2 = 0 # loading edge 2 
 	t.stepTime = 1 # Total step time
 	t.uFactor = 2 # Multiplier for displacement in force displacement curve
 	t.UvsRFplot = True # force displacement plot
 	t.peakLoad = 100 # peak load
-	t.fTough = 0.42 # Mixed mode fracture toughness
+	t.fTough = 0.50 # Mixed mode fracture toughness
 	t.BC = [0,0,5] # Displacement boundary condition on the load edge/face
 	t.matPropCz = [1000000, 18, 18*((2.89/0.42)**0.5), 0.42, 2.89, 2.35] # List of material properties of the cohesive zone
 	t.matTypeTop = "AnIso"
@@ -31,7 +31,7 @@ def RUN(Name, Interface):
 	t.TabPosition = 1
 	t.nCpu = 7
 	t.nGpu = 1
-	t.meshSeed = [0.1, 5, 0.6]
+	t.meshSeed = [0.1, 5, 0.5]
 	t.crackSeed = 5
 	t.name = Name
 	t.matTypeCz = Interface
@@ -100,8 +100,8 @@ def RUN(Name, Interface):
 	os.chdir(cwd)
 	out.addToDatabase('OutputDatabase.json')
 
-Interfaces = ['AbqMatLib','../../IDF.for','../../FDF.for','../../FDF_Imp.for']
-ID = '1025_00'
+Interfaces = ['AbqMatLib','../../IDF.for','../../FDF_Imp.for']
+ID = '1027_00'
 i = 1
 for Interface in Interfaces:
 	Name = ID+str(i)
