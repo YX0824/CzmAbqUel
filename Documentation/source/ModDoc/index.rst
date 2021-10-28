@@ -2,6 +2,10 @@ Package main
 ===================
 
 .. automodule:: czmtestkit
+   :imported-members:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Packages modules
 ================

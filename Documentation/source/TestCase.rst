@@ -8,6 +8,8 @@ Test Cases
 
 	Analytical Models <Examples/Analytical.rst>
 
+	Finite Element Models <Examples/FESim.rst>
+
 ..
 	Single element test
 

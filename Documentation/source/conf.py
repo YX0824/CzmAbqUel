@@ -23,7 +23,7 @@ copyright = '2021, Nanditha Mudunuru'
 author = 'Nanditha Mudunuru, Miguel Bessa, Albert Turon'
 
 # The full version, including alpha/beta/rc tags
-release = 'v1.0.0-a.3.0.1'
+release = 'v1.0.0-a.3.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -64,5 +64,5 @@ html_static_path = ['_static']
 
 # -- Excluding abaqus modules from documentation -------------------------------------------------
 autodoc_mock_imports = ["abaqus", "abaqusConstants","material","section","part","assembly",
-						"step", "interaction","mesh","load","job","pamdas","numpy","matplotlib",
+						"step", "interaction","mesh","load","job","pandas","numpy","matplotlib",
 						"scipy"]
